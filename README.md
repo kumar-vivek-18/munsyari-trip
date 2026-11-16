@@ -14,9 +14,9 @@ npm run dev
 - `/` — journey overview, six chapter links and winter guidance
 - `/route` — complete route atlas with selectable journey legs
 - `/day/01` — train preparation, overnight packing, boarding and arrival
-- `/day/02` through `/day/06` — dedicated daily field guides with maps, mind maps, point-to-point schedules, visit durations, sights, overnight requirements and preparation for the next day
+- `/day/02` through `/day/06` — daily field guides with maps, ordered stop-by-stop routes, visit durations, sights, overnight requirements and preparation for the next day
 
-Checklists are saved in the current browser's local storage. Day plans can be copied or printed.
+Each stop opens an accessible task dialog (bottom sheet on mobile) with timing, incoming and next legs, and a per-stop checklist. Previous/next controls follow travel order. Checklists are saved in the current browser's local storage. Day plans can be copied or printed.
 
 ## Validation
 

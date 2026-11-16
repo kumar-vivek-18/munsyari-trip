@@ -2,7 +2,8 @@ import { lazy, Suspense, useEffect, useState, type CSSProperties } from 'react'
 import { motion, useScroll, useSpring } from 'framer-motion'
 import { Link, NavLink, Navigate, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { ArrowDown, ArrowLeft, ArrowRight, BedDouble, Bike, Check, CheckCheck, ChevronRight, Clock3, Compass, Copy, ExternalLink, MapPin, MountainSnow, PackageCheck, Printer, Route, ShieldAlert, Sparkles, Sunrise, Train } from 'lucide-react'
-import { DayMindMap, itinerary } from './App'
+import { itinerary } from './App'
+import DayPath from './DayPath'
 import { dayGuides } from './day-guides'
 
 const JourneyMap = lazy(() => import('./JourneyMap'))
@@ -95,11 +96,11 @@ export function DayPage() {
     </section>
     <div className="day-stats-bar"><div><Route /><span>PLANNED DISTANCE<strong>{day.distance}</strong></span></div><div><Clock3 /><span>TRAVEL ESTIMATE<strong>{day.saddle}</strong></span></div><div><MapPin /><span>WAYPOINTS<strong>{day.stops.length} stops</strong></span></div><div><BedDouble /><span>OVERNIGHT<strong>{day.stay}</strong></span></div></div>
     <nav className="chapter-rail" aria-label="Journey days">{itinerary.map((item) => <NavLink key={item.day} to={`/day/${item.day}`}><span>{item.day}</span><div><small>{item.date}</small><strong>{item.title}</strong></div><ChevronRight size={14} /></NavLink>)}</nav>
-    <nav className="day-local-nav" aria-label="Day sections"><span>IN THIS CHAPTER</span><a href="#day-plan">Plan & mind map</a><a href="#day-map">Route map</a><a href="#day-highlights">Famous places</a>{index === 0 && <a href="#train-prep">Train & packing</a>}<a href="#day-night">Stay & next day</a></nav>
+    <nav className="day-local-nav" aria-label="Day sections"><span>IN THIS CHAPTER</span><a href="#day-plan">Step-by-step plan</a><a href="#day-map">Route map</a><a href="#day-highlights">Famous places</a>{index === 0 && <a href="#train-prep">Train & packing</a>}<a href="#day-night">Stay & next day</a></nav>
 
     <section className="day-overview detail-section" id="day-plan"><div className="detail-section-title"><span>01 / THE PLAN OF THE DAY</span><h2>Every stop.<br /><em>Enough time for it.</em></h2><p>{day.pacing || 'From platform arrival to bike pickup, keep the overnight essentials accessible and the next morning flexible.'}</p></div>
       <div className="day-route-ribbon">{guide.route.map((point, routeIndex) => <span key={point}><i>{String(routeIndex + 1).padStart(2, '0')}</i>{point}{routeIndex < guide.route.length - 1 && <ArrowRight size={14} />}</span>)}</div>
-      <DayMindMap day={day} />
+      <DayPath key={day.day} day={day} />
     </section>
 
     {index === 0 && <div className="detail-section train-section-wrap"><TrainBriefing /></div>}

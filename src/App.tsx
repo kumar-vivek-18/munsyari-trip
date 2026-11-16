@@ -1,5 +1,5 @@
-import { lazy, Suspense, useEffect, useState, type CSSProperties } from 'react'
-import { AnimatePresence, motion, useScroll, useSpring, useTransform } from 'framer-motion'
+import { lazy, Suspense, useState } from 'react'
+import { motion, useScroll, useSpring, useTransform } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import {
   ArrowDown,
@@ -8,18 +8,15 @@ import {
   CalendarDays,
   Check,
   ChevronRight,
-  Clock3,
   CloudSnow,
   Compass,
   Fuel,
   MountainSnow,
   ShieldAlert,
   Snowflake,
-  Sparkles,
   Sunrise,
   ThermometerSnowflake,
   Train,
-  Route,
   X,
 } from 'lucide-react'
 
@@ -65,10 +62,10 @@ export const itinerary: Day[] = [
     theme: 'The journey begins on the rails',
     summary: 'Board the Ranikhet Express at Old Delhi and sleep your way toward Kumaon. Keep warm layers accessible and expect possible winter-fog delays.',
     stops: [
-      { time: '20:45', label: 'Old Delhi Station', note: 'Arrive early; confirm platform and coach.', distance: 'START', travel: 'Check-in', stay: '1 hr 20 min', highlights: ['Dinner packed', 'Water refill', 'Coach check'] },
-      { time: '22:05', label: 'Ranikhet Express 15013', note: 'Settle in for the overnight run to Kumaon.', from: 'Old Delhi', distance: '≈277 km', travel: '≈7 hrs', stay: 'Overnight', highlights: ['Secure luggage', 'Keep thermals handy', 'Set an arrival alarm'] },
-      { time: '≈05:05', label: 'Kathgodam Station', note: 'Fog may delay arrival—do not rush into darkness.', from: 'Old Delhi', distance: '≈277 km', travel: 'Overnight rail', stay: '≈1 hr 45 min', highlights: ['Station chai', 'Freshen up', 'Check visibility'] },
-      { time: '07:00', label: 'Bike pickup', note: 'Inspect every contact point before loading luggage.', from: 'Kathgodam Station', distance: 'Local', travel: '10–15 min', stay: '≈1 hr', highlights: ['Tyres & brakes', 'Documents', 'Luggage balance'] },
+      { time: '20:45', label: 'Old Delhi Station', note: 'Arrive early; confirm platform and coach.', distance: 'START', travel: 'Check-in', stay: '1 hr 20 min', depart: '22:05', highlights: ['Confirm platform, coach and berth', 'Pack dinner and refill drinking water', 'Keep ticket and photo ID accessible'] },
+      { time: '22:05', label: 'Ranikhet Express 15013', note: 'Departure checkpoint: board at Old Delhi, then settle in for the overnight run to Kumaon. The next leg is the train journey.', from: 'Old Delhi Station', distance: 'Same station', travel: 'Platform → coach', stay: 'Overnight on board', depart: '22:05', highlights: ['Secure luggage and keep valuables close', 'Keep thermals and overnight bag handy', 'Set an arrival alarm and check train status'] },
+      { time: '≈05:05 · 09 JAN', label: 'Kathgodam Station', note: 'Fog may delay arrival—do not rush into darkness.', from: 'Old Delhi', distance: '≈277 km', travel: '≈7 hrs overnight rail', stay: '≈1 hr 45 min', depart: '06:50', highlights: ['Have tea and freshen up', 'Contact the rental shop about pickup', 'Check daylight and visibility before riding'] },
+      { time: '07:00', label: 'Bike pickup', note: 'Inspect every contact point before loading luggage.', from: 'Kathgodam Station', distance: 'Local', travel: '10–15 min', stay: '≈1 hr', depart: '08:00', highlights: ['Inspect tyre tread, brakes and lights', 'Verify rental documents, licence and helmet', 'Secure luggage and check its balance'] },
     ],
     coords: { x: 8, y: 90 },
     mode: 'rail',
@@ -176,7 +173,7 @@ export const itinerary: Day[] = [
       { time: '10:30', label: 'Almora', note: 'A half-hour meal break, not a Lala Bazaar shopping circuit. If fog delayed the start, omit the repeat Kainchi visit.', from: 'Kausani', distance: '≈55 km', travel: '≈2.5 hrs', stay: '30 min', depart: '11:00', visit: 'Meal / rest', highlights: ['Meal break', 'Bal Mithai takeaway', 'Stretch'] },
       { time: '12:45', label: 'Kainchi Dham', note: 'Optional repeat visit with a full two-hour allowance. If you arrive late or queues are long, skip this repeat—not the bike-return buffer. Bhimtal is an alternative 1-hour lake stop, never an additional visit.', from: 'Almora', distance: '≈48 km', travel: '≈1 hr 45 min', stay: '1.5–2 hrs', depart: '14:45', visit: 'Optional visit', highlights: ['Unhurried darshan', 'Parking & queues', 'Or Bhimtal instead'] },
       { time: '16:00', label: 'Kathgodam', note: 'Reserve about an hour for bike handover, deposit paperwork and repacking; use the remaining time for dinner and the station.', from: 'Kainchi Dham', distance: '≈35 km', travel: '≈1 hr 15 min', stay: '≈4 hrs', visit: 'Meal / rest', highlights: ['Bike return & deposit', 'Early dinner', 'Station by 19:45'] },
-      { time: '20:35', label: 'Ranikhet Express', note: 'Board the overnight return with a comfortable buffer.', from: 'Kathgodam', distance: '≈277 km', travel: '≈7 hrs', stay: 'Overnight', highlights: ['Confirm coach', 'Secure luggage', 'Share trip photos'] },
+      { time: '20:35', label: 'Ranikhet Express', note: 'Departure checkpoint: reach the station by 19:45 and board the overnight return with a comfortable buffer.', from: 'Kathgodam bike return', distance: 'Local transfer', travel: 'Station transfer + boarding buffer', stay: 'Overnight on board', depart: '20:35', highlights: ['Confirm coach and berth', 'Secure luggage and keep ticket accessible', 'Check expected arrival before planning a cab'] },
       { time: 'EARLY 14 JAN', label: 'Old Delhi', note: 'Journey complete—avoid scheduling an early commitment.', from: 'Kathgodam', distance: '≈277 km', travel: 'Overnight rail', stay: 'Trip complete', highlights: ['Breakfast', 'Cab home', 'Rest day'] },
     ],
     coords: { x: 24, y: 79 },
@@ -194,93 +191,6 @@ const checklist = [
   ['Tyre tread + brake inspection', 'Bike'],
   ['Offline maps + power bank', 'Navigation'],
 ]
-
-const nodePositions = {
-  3: [{ x: 17, y: 20 }, { x: 84, y: 50 }, { x: 17, y: 80 }],
-  4: [{ x: 16, y: 20 }, { x: 84, y: 20 }, { x: 16, y: 80 }, { x: 84, y: 80 }],
-  5: [{ x: 15, y: 17 }, { x: 85, y: 17 }, { x: 13, y: 76 }, { x: 50, y: 84 }, { x: 87, y: 76 }],
-  6: [{ x: 14, y: 16 }, { x: 50, y: 15 }, { x: 86, y: 16 }, { x: 14, y: 82 }, { x: 50, y: 84 }, { x: 86, y: 82 }],
-}
-
-export function DayMindMap({ day }: { day: Day }) {
-  const [selectedStop, setSelectedStop] = useState(0)
-  useEffect(() => setSelectedStop(0), [day.day])
-  const positions = nodePositions[day.stops.length as keyof typeof nodePositions] ?? nodePositions[4]
-  const modeIcon = day.mode === 'rail' ? <Train size={24} /> : day.mode === 'local' ? <Compass size={24} /> : <Bike size={24} />
-  const selected = day.stops[selectedStop]
-
-  return (
-    <AnimatePresence mode="wait">
-      <motion.div className="mind-map" key={day.day} initial={{ opacity: 0, scale: .985 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: .98 }} transition={{ duration: .4 }}>
-        <div className="mind-map-topline">
-          <span>{day.theme}</span>
-          <div><i /> TAP ANY NODE TO EXPLORE</div>
-        </div>
-        {day.pacing && <div className="day-pacing"><Clock3 size={20} /><div><strong>TIME TO ACTUALLY BE THERE</strong><p>{day.pacing}</p><small>Planning windows, not guarantees. Verify opening hours, queues and winter road conditions locally.</small></div></div>}
-        <div className="mind-canvas">
-          <svg className="mind-connectors" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-            {day.stops.map((_, index) => {
-              const pos = positions[index]
-              return <motion.path key={index} d={`M 50 50 Q ${(50 + pos.x) / 2} ${pos.y < 50 ? pos.y + 12 : pos.y - 12} ${pos.x} ${pos.y}`} initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: .7, delay: index * .1 }} />
-            })}
-          </svg>
-          <motion.div className="mind-center" initial={{ scale: .8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: 'spring', delay: .15 }}>
-            <div className="mind-mode">{modeIcon}<span>{day.mode}</span></div>
-            <small>DAY {day.day} · {day.date}</small>
-            <h3>{day.title}</h3>
-            <p>{day.route}</p>
-            <div className="mind-center-stats"><span>{day.distance}<small>DISTANCE</small></span><span>{day.saddle}<small>TRAVEL</small></span><span>{day.stay}<small>NIGHT</small></span></div>
-          </motion.div>
-          {day.stops.map((stop, index) => {
-            const pos = positions[index]
-            return (
-              <motion.button
-                key={`${stop.time}-${stop.label}`}
-                className={`mind-node ${selectedStop === index ? 'active' : ''}`}
-                style={{ '--x': `${pos.x}%`, '--y': `${pos.y}%`, '--delay': `${index * .08}s` } as CSSProperties}
-                initial={{ opacity: 0, scale: .7 }} animate={{ opacity: 1, scale: 1 }} transition={{ type: 'spring', delay: .2 + index * .1 }}
-                onClick={() => setSelectedStop(index)}
-              >
-                <span className="mind-node-index">{String(index + 1).padStart(2, '0')}</span>
-                {stop.visit && <span className={`visit-type ${stop.visit === 'Optional visit' ? 'optional' : ''}`}>{stop.visit}</span>}
-                <time>{stop.time}</time>
-                <strong>{stop.label}</strong>
-                <div className="mind-node-meta"><span>{stop.distance}</span><span>{stop.travel}</span></div>
-                <small>Stay: {stop.stay}</small>
-                {stop.depart && <small className="node-depart">Leave by {stop.depart}</small>}
-                <i className="mind-node-pulse" />
-              </motion.button>
-            )
-          })}
-        </div>
-        <div className="mind-inspector">
-          <div className="inspector-place"><span>SELECTED STOP / {String(selectedStop + 1).padStart(2, '0')}</span><strong>{selected?.label}</strong><p>{selected?.note}</p></div>
-          <div className="inspector-leg"><span>INCOMING LEG</span><strong>{selected?.from ? `${selected.from} → ${selected.label}` : 'Day starting point'}</strong><div><b><Route size={13} /> {selected?.distance}</b><b><Clock3 size={13} /> {selected?.travel}</b><b>HALT · {selected?.stay}</b>{selected?.depart && <b>LEAVE BY · {selected.depart}</b>}</div></div>
-          <div className="inspector-highlights"><span><Sparkles size={12} /> DO NOT MISS</span><div>{selected?.highlights.map((highlight) => <b key={highlight}>{highlight}</b>)}</div></div>
-          <div className="mind-warning"><ShieldAlert size={16} /> {day.note}</div>
-        </div>
-        <div className="roadbook">
-          <div className="roadbook-heading"><div><span>DETAILED DAY ROADBOOK</span><strong>Point-to-point plan</strong></div><p>{day.stops.length} STOPS · OPTIONAL VISITS ARE NOT CUMULATIVE</p></div>
-          <div className="roadbook-grid">
-            {day.stops.map((stop, index) => (
-              <motion.button key={`${stop.label}-roadbook`} className={selectedStop === index ? 'active' : ''} onClick={() => setSelectedStop(index)} whileHover={{ y: -3 }}>
-                <div className="roadbook-card-top"><span>{String(index + 1).padStart(2, '0')}</span><time>{stop.time}</time></div>
-                {stop.visit && <span className={`visit-type ${stop.visit === 'Optional visit' ? 'optional' : ''}`}>{stop.visit}</span>}
-                <h4>{stop.label}</h4>
-                <div className="roadbook-leg"><small>{stop.from ? `FROM ${stop.from}` : 'DAY START'}</small><div><b>{stop.distance}</b><i /><b>{stop.travel}</b></div></div>
-                <p>{stop.note}</p>
-                <div className="roadbook-stay"><Clock3 size={13} /><span>Planned halt</span><strong>{stop.stay}</strong></div>
-                {stop.depart && <div className="roadbook-depart"><ArrowRight size={13} /><span>Next-leg departure</span><strong>{stop.depart}</strong></div>}
-                <div className="roadbook-do"><span>DO HERE</span>{stop.highlights.map((highlight) => <i key={highlight}><Check size={11} />{highlight}</i>)}</div>
-              </motion.button>
-            ))}
-          </div>
-          <p className="roadbook-disclaimer">Distances and driving times are approximate. Arrival windows depend on the previous halt and road conditions; longer visits require dropping optional stops, not riding faster or after dark.</p>
-        </div>
-      </motion.div>
-    </AnimatePresence>
-  )
-}
 
 function App() {
   const [activeDay, setActiveDay] = useState(0)
