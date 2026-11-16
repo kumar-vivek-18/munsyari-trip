@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@vitejs/plugin-react": "latest",
@@ -16,9 +17,11 @@
     "react": "latest",
     "react-dom": "latest",
     "react-leaflet": "^5.0.0",
+    "react-router-dom": "^7.18.5",
     "vite": "latest"
   },
   "devDependencies": {
+    "@playwright/test": "^1.65.1",
     "@types/leaflet": "^1.9.22",
     "@types/react": "latest",
     "@types/react-dom": "latest",

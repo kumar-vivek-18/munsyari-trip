@@ -1,12 +1,20 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { useReducedMotion } from 'framer-motion'
 import L, { type LatLngBoundsExpression, type LatLngExpression } from 'leaflet'
 import { Circle, MapContainer, Marker, Polyline, TileLayer, Tooltip, useMap } from 'react-leaflet'
 import { Bike, Expand, Snowflake, TrainFront } from 'lucide-react'
-import routeData from './route-data.json'
+import storedRoutes from './route-data.json'
+
+const routeData = {
+  ...storedRoutes,
+  // Local sightseeing is an indicative circuit, not a road-routing response.
+  day4: [[30.0674, 80.2386], [30.050108, 80.301306], [30.0674, 80.2386], [30.058, 80.225], [30.063, 80.213], [30.0674, 80.2386]],
+}
 
 type JourneyMapProps = {
   activeDay: number
   onDayChange: (day: number) => void
+  initialOverview?: boolean
 }
 
 type RouteKey = keyof typeof routeData
@@ -20,24 +28,22 @@ const routeMeta: { key: RouteKey; day: number; label: string; color: string; mod
   { key: 'day6', day: 5, label: 'Kausani → Kathgodam + Delhi train', color: '#f2a4c5', mode: 'bike' },
 ]
 
-const places: { name: string; pos: [number, number]; day: number; type?: string; detail?: string }[] = [
-  { name: 'Old Delhi', pos: [28.6606, 77.2273], day: 0, type: 'rail' },
-  { name: 'Kathgodam', pos: [29.2688, 79.5453], day: 1, type: 'hub' },
-  { name: 'Bhimtal', pos: [29.3461, 79.5519], day: 1, type: 'sight', detail: 'Lake and breakfast stop' },
-  { name: 'Kainchi Dham', pos: [29.3919, 79.5123], day: 1, type: 'sight', detail: 'Ashram and temple' },
-  { name: 'Almora', pos: [29.5892, 79.6467], day: 1, detail: 'Lala Bazaar and lunch' },
-  { name: 'Bageshwar', pos: [29.8376, 79.7716], day: 1, type: 'night', detail: 'Night 01 · Baghnath Temple' },
-  { name: 'Thal', pos: [29.8265, 80.1408], day: 2, type: 'fuel', detail: 'Last reliable fuel' },
+const places: { name: string; pos: [number, number]; day: number; days?: number[]; type?: string; detail?: string }[] = [
+  { name: 'Old Delhi', pos: [28.6606, 77.2273], day: 0, days: [0, 5], type: 'rail' },
+  { name: 'Kathgodam', pos: [29.2688, 79.5453], day: 1, days: [0, 1, 5], type: 'hub' },
+  { name: 'Bhimtal', pos: [29.3461, 79.5519], day: 5, type: 'sight', detail: 'Alternative lake stop, not an additional visit' },
+  { name: 'Kainchi Dham', pos: [29.3919, 79.5123], day: 1, days: [1, 5], type: 'sight', detail: 'Reserve 1.5–2 hours' },
+  { name: 'Almora', pos: [29.5892, 79.6467], day: 1, days: [1, 5], detail: 'Meal stop; market visit not allocated' },
+  { name: 'Bageshwar', pos: [29.8376, 79.7716], day: 1, days: [1, 2, 4], type: 'night', detail: 'Night 01 · Baghnath Temple' },
+  { name: 'Thal', pos: [29.8265, 80.1408], day: 2, days: [2, 4], type: 'fuel', detail: 'Last reliable fuel' },
   { name: 'Birthi Falls', pos: [30.003, 80.174], day: 2, type: 'sight', detail: 'Short waterfall stop' },
-  { name: 'Ratapani', pos: [30.0377, 80.184], day: 2, type: 'risk', detail: 'Critical snow checkpoint' },
-  { name: 'Munsyari', pos: [30.0674, 80.2386], day: 2, type: 'night' },
-  { name: 'Munsyari local base', pos: [30.0674, 80.2386], day: 3, type: 'night', detail: 'Local exploration base' },
-  { name: 'Khaliya trail side', pos: [30.095, 80.224], day: 3, type: 'sight', detail: 'Attempt only if trail is clear' },
-  { name: 'Madkot', pos: [30.034, 80.151], day: 3, type: 'sight', detail: 'Hot springs' },
+  { name: 'Ratapani', pos: [30.0377, 80.184], day: 2, days: [2, 4], type: 'risk', detail: 'Critical snow checkpoint' },
+  { name: 'Munsyari', pos: [30.0674, 80.2386], day: 2, days: [2, 3, 4], type: 'night', detail: 'Nights 02 + 03' },
+  { name: 'Madkot', pos: [30.050108, 80.301306], day: 3, type: 'sight', detail: 'Hot springs; confirm access locally' },
   { name: 'Nanda Devi Temple', pos: [30.058, 80.225], day: 3, type: 'sight', detail: 'Temple and mountain view' },
-  { name: 'Betulidhar', pos: [30.063, 80.213], day: 3, type: 'sight', detail: 'Sunset viewpoint' },
+  { name: 'Betulidhar', pos: [30.063, 80.213], day: 3, type: 'sight', detail: 'Afternoon viewpoint; return before dark' },
   { name: 'Baijnath', pos: [29.92, 79.615], day: 4, type: 'sight', detail: 'Historic temple complex' },
-  { name: 'Kausani', pos: [29.8445, 79.6038], day: 4, type: 'night', detail: 'Night 04 · Himalayan viewpoint' },
+  { name: 'Kausani', pos: [29.8445, 79.6038], day: 4, days: [4, 5], type: 'night', detail: 'Night 04 · Himalayan viewpoint' },
 ]
 
 const trainBack = [...routeData.rail].reverse() as [number, number][]
@@ -54,24 +60,21 @@ function markerIcon(day: number, type?: string) {
 
 function MapViewport({ coordinates, overview }: { coordinates: [number, number][]; overview: boolean }) {
   const map = useMap()
+  const reduceMotion = useReducedMotion()
   useEffect(() => {
     if (!coordinates.length) return
-    map.fitBounds(coordinates as LatLngBoundsExpression, { padding: [45, 45], maxZoom: overview ? 8 : 11, animate: true, duration: 1 })
-  }, [coordinates, map, overview])
+    map.fitBounds(coordinates as LatLngBoundsExpression, { padding: [45, 45], maxZoom: overview ? 8 : 11, animate: !reduceMotion, duration: 1 })
+  }, [coordinates, map, overview, reduceMotion])
   return null
 }
 
-export default function JourneyMap({ activeDay, onDayChange }: JourneyMapProps) {
-  const [overview, setOverview] = useState(true)
-  const firstRender = useRef(true)
-
-  useEffect(() => {
-    if (firstRender.current) {
-      firstRender.current = false
-      return
-    }
+export default function JourneyMap({ activeDay, onDayChange, initialOverview = true }: JourneyMapProps) {
+  const [overview, setOverview] = useState(initialOverview)
+  const [previousDay, setPreviousDay] = useState(activeDay)
+  if (previousDay !== activeDay) {
+    setPreviousDay(activeDay)
     setOverview(false)
-  }, [activeDay])
+  }
 
   const visibleRoutes = useMemo(() => overview ? routeMeta : routeMeta.filter((route) => route.day === activeDay), [activeDay, overview])
   const bounds = useMemo(() => {
@@ -98,7 +101,7 @@ export default function JourneyMap({ activeDay, onDayChange }: JourneyMapProps) 
         <div className="live-map-label"><span /> OPENSTREETMAP · INTERACTIVE</div>
       </div>
       <div className="real-map-frame">
-        <MapContainer center={[29.55, 79.55]} zoom={8} zoomControl={false} scrollWheelZoom className="leaflet-map">
+        <MapContainer center={[29.55, 79.55]} zoom={8} zoomControl scrollWheelZoom={false} className="leaflet-map">
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -114,12 +117,13 @@ export default function JourneyMap({ activeDay, onDayChange }: JourneyMapProps) 
               <Tooltip sticky>{route.label} · Day {String(route.day + 1).padStart(2, '0')}</Tooltip>
             </Polyline>
           ))}
+          {!overview && <Polyline positions={routeData[routeMeta[activeDay].key] as LatLngExpression[]} interactive={false} pathOptions={{ className: 'journey-route-flow', color: '#ffffff', weight: 2, opacity: .55, dashArray: '4 18' }} />}
           {(overview || activeDay === 5) && <Polyline positions={trainBack} pathOptions={{ color: '#f3be55', weight: overview ? 4 : 6, opacity: .8, dashArray: '7 9' }} />}
           <Circle center={[30.0377, 80.184]} radius={7500} pathOptions={{ color: '#ff5a36', fillColor: '#ff5a36', fillOpacity: .12, dashArray: '4 6', weight: 2 }}>
             <Tooltip direction="top"><strong>Snow-risk zone</strong><br />Ratapani → Munsyari</Tooltip>
           </Circle>
-          {places.filter((place) => overview || place.day === activeDay || (activeDay === 5 && place.name === 'Kathgodam')).map((place) => (
-            <Marker key={place.name} position={place.pos} icon={markerIcon(place.day, place.type)} eventHandlers={{ click: () => chooseDay(place.day) }}>
+          {places.filter((place) => overview || (place.days || [place.day]).includes(activeDay)).map((place) => (
+            <Marker key={place.name} position={place.pos} icon={markerIcon(place.day, place.type)} eventHandlers={{ click: () => chooseDay((place.days || [place.day]).includes(activeDay) && !overview ? activeDay : place.day) }}>
               <Tooltip direction="top" offset={[0, -10]}><strong>{place.name}</strong>{place.detail && <><br />{place.detail}</>}</Tooltip>
             </Marker>
           ))}
@@ -131,7 +135,7 @@ export default function JourneyMap({ activeDay, onDayChange }: JourneyMapProps) 
         </div>
         <div className="map-legend-new"><span><i className="rail" /> Rail</span><span><i className="ride" /> Bike route</span><span><i className="snow" /> Snow risk</span></div>
       </div>
-      <div className="map-footnote"><span>Road geometry follows OpenStreetMap routing data. Rail line is indicative.</span><strong>CLICK A ROUTE OR DAY TO EXPLORE</strong></div>
+      <div className="map-footnote"><span>OSM road alignments; rail and local circuit are indicative. Not live road status or turn-by-turn navigation.</span><strong>CLICK A ROUTE OR DAY TO EXPLORE</strong></div>
     </div>
   )
 }

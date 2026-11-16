@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useState, type CSSProperties } from 'react'
 import { AnimatePresence, motion, useScroll, useSpring, useTransform } from 'framer-motion'
+import { Link } from 'react-router-dom'
 import {
   ArrowDown,
   ArrowRight,
@@ -24,7 +25,7 @@ import {
 
 const JourneyMap = lazy(() => import('./JourneyMap'))
 
-type Day = {
+export type Day = {
   day: string
   date: string
   title: string
@@ -52,7 +53,7 @@ type Day = {
   pacing?: string
 }
 
-const itinerary: Day[] = [
+export const itinerary: Day[] = [
   {
     day: '01',
     date: '08 JAN',
@@ -201,7 +202,7 @@ const nodePositions = {
   6: [{ x: 14, y: 16 }, { x: 50, y: 15 }, { x: 86, y: 16 }, { x: 14, y: 82 }, { x: 50, y: 84 }, { x: 86, y: 82 }],
 }
 
-function DayMindMap({ day }: { day: Day }) {
+export function DayMindMap({ day }: { day: Day }) {
   const [selectedStop, setSelectedStop] = useState(0)
   useEffect(() => setSelectedStop(0), [day.day])
   const positions = nodePositions[day.stops.length as keyof typeof nodePositions] ?? nodePositions[4]
@@ -288,7 +289,6 @@ function App() {
   const { scrollYProgress } = useScroll()
   const progress = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 })
   const heroY = useTransform(scrollYProgress, [0, 0.3], [0, 130])
-  const active = itinerary[activeDay]
 
   const scrollTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
@@ -304,7 +304,7 @@ function App() {
           <span>NORTHBOUND<small>WINTER RUN / 06</small></span>
         </button>
         <div className={`nav-links ${menuOpen ? 'open' : ''}`}>
-          <button onClick={() => scrollTo('route')}>Route</button>
+          <Link to="/route">Route atlas</Link>
           <button onClick={() => scrollTo('plan')}>Itinerary</button>
           <button onClick={() => scrollTo('snow')}>Snow protocol</button>
           <button className="nav-cta" onClick={() => scrollTo('kit')}>Pack smart <ArrowRight size={15} /></button>
@@ -328,6 +328,7 @@ function App() {
             <div className="hero-intro">
               <p>Six stages from the Old Delhi night train to the high Himalayan road. One snow-sensitive climb. Every move built around daylight.</p>
               <button onClick={() => scrollTo('route')}>Explore the route <ArrowDown size={16} /></button>
+              <Link className="hero-day-link" to="/day/01">Start with Day 01 <ArrowRight size={14} /></Link>
             </div>
             <div className="weather-card">
               <div><Snowflake size={17} /><span>SNOW WINDOW</span><strong>Ratapani → Munsyari</strong></div>
@@ -357,17 +358,19 @@ function App() {
 
       <section className="itinerary-section section" id="plan">
         <div className="section-heading compact">
-          <div><span className="section-number light">02 / ITINERARY</span><h2>Six stages.<br />One connected story.</h2></div>
-          <div className="day-progress"><span>DAY {active.day}</span><div><motion.i animate={{ width: `${((activeDay + 1) / itinerary.length) * 100}%` }} /></div><small>06</small></div>
+          <div><span className="section-number light">02 / THE CHAPTERS</span><h2>Six days.<br />Go deeper into each.</h2></div>
+          <p>Every day has its own field guide: the complete route, a dedicated map, the places worth stopping for, and enough time to actually be there.</p>
         </div>
-        <div className="day-tabs">
-          {itinerary.map((item, index) => (
-            <button key={item.day} className={index === activeDay ? 'active' : ''} onClick={() => setActiveDay(index)}>
-              <span>{item.day}</span><small>{item.date}</small>
-            </button>
-          ))}
+        <div className="chapter-grid">
+          {itinerary.map((item, index) => <motion.div key={item.day} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: index % 3 * .09 }}>
+            <Link className={`chapter-card chapter-${item.day}`} to={`/day/${item.day}`}>
+              <div className="chapter-top"><span>{item.date} / 2027</span>{item.mode === 'rail' ? <Train size={19} /> : item.mode === 'local' ? <Compass size={19} /> : <Bike size={19} />}</div>
+              <span className="chapter-number">{item.day}</span>
+              <div className="chapter-content"><small>{item.theme}</small><h3>{item.title}</h3><p>{item.route}</p><div><span>{item.distance}</span><span>{item.stops.length} stops</span><span>{item.stay}</span></div></div>
+              <div className="chapter-bottom"><span>EXPLORE DAY {item.day}</span><ArrowRight size={18} /></div>
+            </Link>
+          </motion.div>)}
         </div>
-        <DayMindMap day={active} />
       </section>
 
       <section className="snow-section section" id="snow">
@@ -386,7 +389,7 @@ function App() {
               <li>Ask locals about shaded ice patches</li>
               <li>Turn around if grip becomes uncertain</li>
             </ul>
-            <div className="decision-meta"><Sunrise size={17} /> Ideal roll-out: 7:30–8:00 AM</div>
+            <div className="decision-meta"><Sunrise size={17} /> Daylight and road condition decide departure</div>
           </motion.div>
           <motion.div className="decision-card no-go" whileHover={{ y: -7 }}>
             <div className="decision-title"><span><X size={17} /> ROAD CLOSED</span><strong>NO-GO</strong></div>
