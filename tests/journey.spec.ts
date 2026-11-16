@@ -1,87 +1,86 @@
 import { test, expect } from '@playwright/test'
 
-test('overview opens a dedicated day and next chapter', async ({ page }) => {
+test('overview has six day plans with working next-day navigation', async ({ page }) => {
   const errors: string[] = []
   page.on('pageerror', (error) => errors.push(error.message))
   await page.goto('/')
-  await expect(page.locator('.chapter-card')).toHaveCount(6)
-  await page.locator('.chapter-01').click()
+  await expect(page.locator('.overview-day-card')).toHaveCount(6)
+  await page.locator('.overview-day-card').first().click()
   await expect(page).toHaveURL(/\/day\/01$/)
-  await expect(page.getByRole('heading', { level: 1 })).toContainText('Night to the Hills')
-  await expect(page.locator('.train-ticket')).toContainText('15013')
-  await expect(page.locator('.packing-cards article')).toHaveCount(3)
-  await page.locator('.chapter-pagination .next').click()
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Night to the Hills')
+  await page.locator('.planner-day-pagination .next').click()
   await expect(page).toHaveURL(/\/day\/02$/)
-  await expect(page.getByRole('heading', { level: 1 })).toContainText('Through Kumaon')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Through Kumaon')
   await expect(page.locator('.ordered-route')).toContainText('1.5–2 hrs')
   await expect(page.locator('.ordered-route')).toContainText('11:00')
   await expect(page.locator('.leaflet-container')).toBeVisible()
   expect(errors).toEqual([])
 })
 
-test('all day URLs load directly with route, schedule, highlights and overnight preparation', async ({ page }) => {
+test('all days expose one schedule with separate places and preparation tabs', async ({ page }) => {
   for (const day of ['01', '02', '03', '04', '05', '06']) {
     await page.goto(`/day/${day}`)
     await expect(page).toHaveTitle(new RegExp(`Day ${day}`))
-    await expect(page.locator('.day-route-ribbon')).toBeVisible()
-    await expect(page.locator('.day-path')).toBeVisible()
+    await expect(page.locator('.compact-path')).toHaveCount(1)
     await expect(page.locator('.path-stop').first()).toBeVisible()
-    await expect(page.locator('.destination-grid > article')).toHaveCount(3)
-    await expect(page.locator('.overnight-note')).toBeVisible()
-    await expect(page.locator('.next-morning')).toBeVisible()
-    await expect(page.locator('.readiness-panel > button')).toHaveCount(4)
+    await expect(page.locator('.planner-tabs button')).toHaveCount(3)
+    await page.getByRole('button', { name: 'Places to visit', exact: true }).click()
+    await expect(page.locator('.place-row')).toHaveCount(3)
+    await expect(page.locator('.compact-path')).toHaveCount(0)
+    await page.getByRole('button', { name: /^(Train|Stay) & preparation$/ }).click()
+    await expect(page.locator('.planner-checklist > button')).toHaveCount(4)
+    await expect(page.locator('.stay-summary')).toBeVisible()
+    await expect(page.locator('.tomorrow-summary')).toBeVisible()
   }
 })
 
-test('daily preparation is saved independently and route stops open their details', async ({ page }) => {
-  await page.goto('/day/02')
-  const check = page.locator('.readiness-panel > button').first()
+test('preparation deep links persist across reload and checklists stay day-specific', async ({ page }) => {
+  await page.goto('/day/01?view=prepare')
+  await expect(page.locator('.train-summary')).toContainText('15013')
+  await expect(page.locator('.packing-summary article')).toHaveCount(3)
+  const check = page.locator('.planner-checklist > button').first()
   await check.click()
   await expect(check).toHaveAttribute('aria-pressed', 'true')
   await page.reload()
   await expect(check).toHaveAttribute('aria-pressed', 'true')
-  await page.locator('.path-stop').nth(1).click()
-  await expect(page.getByRole('dialog')).toHaveAccessibleName('Kainchi Dham')
-  await expect(page.locator('.stop-dialog-timing')).toContainText('11:00')
-  await page.getByRole('button', { name: 'Close stop details' }).click()
-  await page.locator('.chapter-rail').getByRole('link').nth(2).click()
-  await expect(page.locator('.readiness-panel > button').first()).toHaveAttribute('aria-pressed', 'false')
+  await page.goto('/day/02?view=prepare')
+  await expect(check).toHaveAttribute('aria-pressed', 'false')
 })
 
-test('route atlas selects a day and opens its full field guide', async ({ page }) => {
+test('route atlas selects a stage and opens its guide', async ({ page }) => {
   await page.goto('/route')
-  await page.locator('.atlas-day-list > div').nth(3).getByRole('button').click()
+  await page.locator('.atlas-stages > div').nth(4).getByRole('button').click()
   await expect(page.locator('.map-route-card')).toContainText('Munsyari local')
-  await page.locator('.atlas-day-list > div').nth(3).getByRole('link').click()
+  await page.locator('.atlas-stages > div').nth(4).getByRole('link').click()
   await expect(page).toHaveURL(/\/day\/04$/)
-  await expect(page.getByRole('heading', { level: 1 })).toContainText('High Country')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('High Country')
 })
 
-test('mobile day pages fit without horizontal overflow', async ({ page }) => {
+test('mobile pages and preparation tabs have no horizontal overflow', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
-  for (const path of ['/', '/day/01', '/day/02', '/day/03', '/day/04', '/day/05', '/day/06', '/route']) {
+  for (const path of ['/', '/day/01', '/day/02', '/day/03', '/day/04', '/day/05', '/day/06', '/route', '/day/01?view=prepare', '/day/03?view=places']) {
     await page.goto(path)
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
   }
 })
 
-test('chapter overview link restores the overview section and browser back restores the day', async ({ page }) => {
+test('all days link returns to overview and browser back restores day', async ({ page }) => {
   await page.goto('/day/03')
-  await page.locator('.day-back').click()
+  await page.locator('.planner-back').click()
   await expect(page).toHaveURL('/#plan')
   await expect(page.locator('#plan')).toBeInViewport()
   await page.goBack()
-  await expect(page.getByRole('heading', { level: 1 })).toContainText('The Snow Gate')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('The Snow Gate')
 })
 
-test('invalid day has a way back to the overview', async ({ page }) => {
+test('invalid day has a route back home', async ({ page }) => {
   await page.goto('/day/99')
-  await expect(page.getByRole('heading', { level: 1 })).toContainText('back on the road')
-  await expect(page.getByRole('link', { name: 'Journey overview' })).toBeVisible()
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('back to the trip')
+  await expect(page.locator('.planner-empty a')).toHaveAttribute('href', '/')
 })
 
-test('ordered stop dialog supports next, previous, saved tasks and keyboard dismissal', async ({ page }) => {
+test('stop panel supports next, previous, saved tasks and keyboard dismissal', async ({ page }) => {
   await page.goto('/day/01')
   await expect(page.locator('.path-stop h4')).toHaveText(['Old Delhi Station', 'Ranikhet Express 15013', 'Kathgodam Station', 'Bike pickup'])
   const opener = page.getByRole('button', { name: 'Open stop 1: Old Delhi Station', exact: true })
@@ -105,7 +104,7 @@ test('ordered stop dialog supports next, previous, saved tasks and keyboard dism
   await expect(page.getByRole('dialog').locator('.stop-task-list button').first()).toHaveAttribute('aria-pressed', 'true')
 })
 
-test('mobile stop sheet stays within viewport and final step closes back to route', async ({ page }) => {
+test('mobile stop sheet fits and returns to its route', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto('/day/02')
   await page.locator('.path-stop').last().click()

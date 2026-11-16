@@ -6,7 +6,7 @@ import './day-path.css'
 
 type SavedTasks = Record<string, boolean>
 
-export default function DayPath({ day }: { day: Day }) {
+export default function DayPath({ day, compact = false }: { day: Day; compact?: boolean }) {
   const [selected, setSelected] = useState(0)
   const [tasks, setTasks] = useState<SavedTasks>(() => {
     try {
@@ -56,9 +56,9 @@ export default function DayPath({ day }: { day: Day }) {
     setTasks((current) => ({ ...current, [key]: !current[key] }))
   }
 
-  return <div className="day-path">
-    <div className="path-heading"><div><span>YOUR DAY, IN ORDER</span><h3>One stop leads to the next.</h3><p>Follow the line. Tap a stop to open its visit plan and checklist.</p></div><div className="path-completion"><CheckCheck size={18} /><strong>{completed}<small> / {totalTasks}</small></strong><span>CHECKED ON THIS DEVICE</span></div></div>
-    {day.pacing && <div className="day-pacing"><Clock3 size={20} /><div><strong>MAKE TIME FOR THE PLACE</strong><p>{day.pacing}</p><small>Travel windows are estimates. Optional visits are not cumulative.</small></div></div>}
+  return <div className={`day-path ${compact ? 'compact-path' : ''}`}>
+    <div className="path-heading"><div><span>{compact ? 'IN TRAVEL ORDER' : 'YOUR DAY, IN ORDER'}</span><h3>{compact ? 'Your schedule' : 'One stop leads to the next.'}</h3><p>{compact ? 'Select a stop for tasks and details.' : 'Follow the line. Tap a stop to open its visit plan and checklist.'}</p></div><div className="path-completion"><CheckCheck size={18} /><strong>{completed}<small> / {totalTasks}</small></strong><span>CHECKED ON THIS DEVICE</span></div></div>
+    {!compact && day.pacing && <div className="day-pacing"><Clock3 size={20} /><div><strong>MAKE TIME FOR THE PLACE</strong><p>{day.pacing}</p><small>Travel windows are estimates. Optional visits are not cumulative.</small></div></div>}
     <div className="path-layout">
       <div className="path-steps">
         <ol className="ordered-route" aria-label={`Day ${day.day} stops in travel order`}>
@@ -70,7 +70,7 @@ export default function DayPath({ day }: { day: Day }) {
               <div className="path-stop-row"><span className={`path-step-marker ${done === item.highlights.length ? 'complete' : ''}`}>{done === item.highlights.length ? <Check size={17} /> : String(index + 1).padStart(2, '0')}</span>
                 <motion.button className="path-stop" onClick={() => openStop(index)} aria-haspopup="dialog" aria-label={`Open stop ${index + 1}: ${item.label}`} whileHover={{ x: 4 }}>
                   <div className="path-stop-top"><time>{item.time}</time><span className={`path-visit ${item.visit === 'Optional visit' ? 'optional' : ''}`}>{item.visit || (index === 0 ? 'Journey starts' : 'Journey step')}</span></div>
-                  <h4>{item.label}</h4><p>{item.note}</p>
+                  <h4>{item.label}</h4>{!compact && <p>{item.note}</p>}
                   <div className="path-stop-stats"><span><Clock3 size={13} />Stay <b>{item.stay}</b></span>{item.depart && <span>Leave by <b>{item.depart}</b></span>}</div>
                   <div className="path-stop-bottom"><span><ListChecks size={14} />{done}/{item.highlights.length} checked</span><strong>Open tasks & details <ArrowRight size={16} /></strong></div>
                 </motion.button>
@@ -80,14 +80,14 @@ export default function DayPath({ day }: { day: Day }) {
         </ol>
         <div className="path-finish"><span><Flag size={18} /></span><div><small>END OF THIS DAY’S PLAN</small><strong>{day.stay}</strong><p>{day.mode === 'rail' ? 'The next chapter continues with the first riding day.' : 'Rest, check tomorrow’s conditions, and prepare your essentials.'}</p></div></div>
       </div>
-      <aside className="path-companion" aria-label="Day route summary">
+      {!compact && <aside className="path-companion" aria-label="Day route summary">
         <div className="path-companion-title"><Route size={21} /><span>DAY {day.day} · {day.date}</span></div><h3>{day.title}</h3><p>{day.summary}</p>
         <div className="path-summary-stats"><span>{day.distance}<small>PLANNED DISTANCE</small></span><span>{day.saddle}<small>TRAVEL ESTIMATE</small></span></div>
         <div className="path-mini-route">{day.stops.map((item, index) => <button key={item.label} onClick={() => openStop(index)} aria-label={`View tasks at ${item.label}`}><i className={selected === index ? 'current' : ''} /><span>{item.label}</span><small>{item.time}</small></button>)}</div>
         <div className="path-day-note"><ShieldAlert size={17} /><p>{day.note}</p></div>
         <div className="path-progress-track"><motion.i animate={{ width: `${completed / totalTasks * 100}%` }} /></div>
         <small className="path-storage-note">Checks track your preparation and visits, not road clearance. Saved locally.</small>
-      </aside>
+      </aside>}
     </div>
 
     <dialog ref={dialog} className="stop-dialog" aria-labelledby={`stop-dialog-title-${day.day}`} onClick={(event) => { if (event.target === event.currentTarget) event.currentTarget.close() }}>

@@ -11,12 +11,14 @@ npm run dev
 
 ## Pages
 
-- `/` — journey overview, six chapter links and winter guidance
+- `/` — compact trip dashboard with six day cards and key trip facts
 - `/route` — complete route atlas with selectable journey legs
 - `/day/01` — train preparation, overnight packing, boarding and arrival
 - `/day/02` through `/day/06` — daily field guides with maps, ordered stop-by-stop routes, visit durations, sights, overnight requirements and preparation for the next day
 
 Each stop opens an accessible task dialog (bottom sheet on mobile) with timing, incoming and next legs, and a per-stop checklist. Previous/next controls follow travel order. Checklists are saved in the current browser's local storage. Day plans can be copied or printed.
+
+Day pages use three views: **Schedule & map**, **Places to visit**, and **Preparation**. The active view is shareable via `?view=places` or `?view=prepare`. Persistent navigation keeps every day one click away; the schedule and map appear side by side on desktop and stack on mobile.
 
 ## Validation
 
