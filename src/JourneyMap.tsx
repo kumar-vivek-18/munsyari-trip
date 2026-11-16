@@ -20,18 +20,24 @@ const routeMeta: { key: RouteKey; day: number; label: string; color: string; mod
   { key: 'day6', day: 5, label: 'Kausani → Kathgodam + Delhi train', color: '#f2a4c5', mode: 'bike' },
 ]
 
-const places: { name: string; pos: [number, number]; day: number; type?: string }[] = [
+const places: { name: string; pos: [number, number]; day: number; type?: string; detail?: string }[] = [
   { name: 'Old Delhi', pos: [28.6606, 77.2273], day: 0, type: 'rail' },
   { name: 'Kathgodam', pos: [29.2688, 79.5453], day: 1, type: 'hub' },
-  { name: 'Bhimtal', pos: [29.3461, 79.5519], day: 1 },
-  { name: 'Kainchi Dham', pos: [29.3919, 79.5123], day: 1 },
-  { name: 'Almora', pos: [29.5892, 79.6467], day: 1 },
-  { name: 'Bageshwar', pos: [29.8376, 79.7716], day: 1, type: 'night' },
-  { name: 'Thal', pos: [29.8265, 80.1408], day: 2, type: 'fuel' },
-  { name: 'Ratapani', pos: [30.0377, 80.184], day: 2, type: 'risk' },
+  { name: 'Bhimtal', pos: [29.3461, 79.5519], day: 1, type: 'sight', detail: 'Lake and breakfast stop' },
+  { name: 'Kainchi Dham', pos: [29.3919, 79.5123], day: 1, type: 'sight', detail: 'Ashram and temple' },
+  { name: 'Almora', pos: [29.5892, 79.6467], day: 1, detail: 'Lala Bazaar and lunch' },
+  { name: 'Bageshwar', pos: [29.8376, 79.7716], day: 1, type: 'night', detail: 'Night 01 · Baghnath Temple' },
+  { name: 'Thal', pos: [29.8265, 80.1408], day: 2, type: 'fuel', detail: 'Last reliable fuel' },
+  { name: 'Birthi Falls', pos: [30.003, 80.174], day: 2, type: 'sight', detail: 'Short waterfall stop' },
+  { name: 'Ratapani', pos: [30.0377, 80.184], day: 2, type: 'risk', detail: 'Critical snow checkpoint' },
   { name: 'Munsyari', pos: [30.0674, 80.2386], day: 2, type: 'night' },
-  { name: 'Madkot', pos: [30.034, 80.151], day: 3 },
-  { name: 'Kausani', pos: [29.8445, 79.6038], day: 4, type: 'night' },
+  { name: 'Munsyari local base', pos: [30.0674, 80.2386], day: 3, type: 'night', detail: 'Local exploration base' },
+  { name: 'Khaliya trail side', pos: [30.095, 80.224], day: 3, type: 'sight', detail: 'Attempt only if trail is clear' },
+  { name: 'Madkot', pos: [30.034, 80.151], day: 3, type: 'sight', detail: 'Hot springs' },
+  { name: 'Nanda Devi Temple', pos: [30.058, 80.225], day: 3, type: 'sight', detail: 'Temple and mountain view' },
+  { name: 'Betulidhar', pos: [30.063, 80.213], day: 3, type: 'sight', detail: 'Sunset viewpoint' },
+  { name: 'Baijnath', pos: [29.92, 79.615], day: 4, type: 'sight', detail: 'Historic temple complex' },
+  { name: 'Kausani', pos: [29.8445, 79.6038], day: 4, type: 'night', detail: 'Night 04 · Himalayan viewpoint' },
 ]
 
 const trainBack = [...routeData.rail].reverse() as [number, number][]
@@ -114,7 +120,7 @@ export default function JourneyMap({ activeDay, onDayChange }: JourneyMapProps) 
           </Circle>
           {places.filter((place) => overview || place.day === activeDay || (activeDay === 5 && place.name === 'Kathgodam')).map((place) => (
             <Marker key={place.name} position={place.pos} icon={markerIcon(place.day, place.type)} eventHandlers={{ click: () => chooseDay(place.day) }}>
-              <Tooltip direction="top" offset={[0, -10]}>{place.name}</Tooltip>
+              <Tooltip direction="top" offset={[0, -10]}><strong>{place.name}</strong>{place.detail && <><br />{place.detail}</>}</Tooltip>
             </Marker>
           ))}
         </MapContainer>

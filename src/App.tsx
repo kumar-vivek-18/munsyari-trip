@@ -7,15 +7,18 @@ import {
   CalendarDays,
   Check,
   ChevronRight,
+  Clock3,
   CloudSnow,
   Compass,
   Fuel,
   MountainSnow,
   ShieldAlert,
   Snowflake,
+  Sparkles,
   Sunrise,
   ThermometerSnowflake,
   Train,
+  Route,
   X,
 } from 'lucide-react'
 
@@ -31,10 +34,22 @@ type Day = {
   stay: string
   theme: string
   summary: string
-  stops: { time: string; label: string; note: string }[]
+  stops: {
+    time: string
+    label: string
+    note: string
+    from?: string
+    distance: string
+    travel: string
+    stay: string
+    depart?: string
+    visit?: 'Full visit' | 'Meal / rest' | 'Safety stop' | 'Overnight' | 'Optional visit'
+    highlights: string[]
+  }[]
   coords: { x: number; y: number }
   mode: 'rail' | 'bike' | 'local'
   note: string
+  pacing?: string
 }
 
 const itinerary: Day[] = [
@@ -49,10 +64,10 @@ const itinerary: Day[] = [
     theme: 'The journey begins on the rails',
     summary: 'Board the Ranikhet Express at Old Delhi and sleep your way toward Kumaon. Keep warm layers accessible and expect possible winter-fog delays.',
     stops: [
-      { time: '20:45', label: 'Old Delhi Station', note: 'Arrive early; platform and coach check' },
-      { time: '22:05', label: 'Ranikhet Express 15013', note: 'Overnight train to Kathgodam' },
-      { time: '05:05', label: 'Kathgodam', note: 'Expected arrival; wait for daylight' },
-      { time: '07:00', label: 'Bike pickup', note: 'Tea, inspection and luggage setup' },
+      { time: '20:45', label: 'Old Delhi Station', note: 'Arrive early; confirm platform and coach.', distance: 'START', travel: 'Check-in', stay: '1 hr 20 min', highlights: ['Dinner packed', 'Water refill', 'Coach check'] },
+      { time: '22:05', label: 'Ranikhet Express 15013', note: 'Settle in for the overnight run to Kumaon.', from: 'Old Delhi', distance: '≈277 km', travel: '≈7 hrs', stay: 'Overnight', highlights: ['Secure luggage', 'Keep thermals handy', 'Set an arrival alarm'] },
+      { time: '≈05:05', label: 'Kathgodam Station', note: 'Fog may delay arrival—do not rush into darkness.', from: 'Old Delhi', distance: '≈277 km', travel: 'Overnight rail', stay: '≈1 hr 45 min', highlights: ['Station chai', 'Freshen up', 'Check visibility'] },
+      { time: '07:00', label: 'Bike pickup', note: 'Inspect every contact point before loading luggage.', from: 'Kathgodam Station', distance: 'Local', travel: '10–15 min', stay: '≈1 hr', highlights: ['Tyres & brakes', 'Documents', 'Luggage balance'] },
     ],
     coords: { x: 8, y: 90 },
     mode: 'rail',
@@ -67,16 +82,17 @@ const itinerary: Day[] = [
     saddle: '7 hrs',
     stay: 'Bageshwar',
     theme: 'Lakes, pines & river valleys',
-    summary: 'Wait for daylight, collect the bikes, and ease into the hills via Bhimtal, Kainchi Dham and Almora. Reach Bageshwar before dusk.',
+    summary: 'Make Kainchi Dham the main visit, with a full two-hour window. Ride directly there from Kathgodam, then stop in Almora for lunch—not another sightseeing circuit.',
     stops: [
-      { time: '07:00', label: 'Kathgodam', note: 'Tea, bike check, wait for clear light' },
-      { time: '10:00', label: 'Bhimtal / Kainchi', note: 'Easy first break' },
-      { time: '13:00', label: 'Almora', note: 'Breakfast-lunch stop' },
-      { time: '17:00', label: 'Bageshwar', note: 'Check in; confirm road status' },
+      { time: '07:00', label: 'Kathgodam', note: 'Breakfast, bike inspection and fuel before the 8 AM departure; wait if fog persists.', distance: 'START', travel: 'Preparation', stay: '1 hr', depart: '08:00', visit: 'Meal / rest', highlights: ['Warm breakfast', 'Full tank', 'Tyres & luggage'] },
+      { time: '09:00', label: 'Kainchi Dham', note: 'Allow 1.5–2 hours for parking, walking, queues, darshan and a quiet visit. Two hours are reserved here; opening and queue conditions need a local check.', from: 'Kathgodam', distance: '≈35 km', travel: '≈1 hr', stay: '1.5–2 hrs', depart: '11:00', visit: 'Full visit', highlights: ['Neem Karoli Baba Ashram', 'Unhurried darshan', 'Parking & queue buffer'] },
+      { time: '13:00', label: 'Almora', note: 'A seated lunch and stretch break. Skip Kasar Devi and market sightseeing on this transfer day.', from: 'Kainchi Dham', distance: '≈48 km', travel: '≈2 hrs', stay: '30 min', depart: '13:30', visit: 'Meal / rest', highlights: ['Lunch', 'Bal Mithai takeaway', 'Water refill'] },
+      { time: '16:30–17:00', label: 'Bageshwar', note: 'Check in and rest first. Temple and Sangam visits are for the next morning, not a rushed dusk arrival.', from: 'Almora', distance: '≈70 km', travel: '≈3–3.5 hrs', stay: 'Overnight', visit: 'Overnight', highlights: ['Hotel check-in', 'Road-status call', 'Dinner & rest'] },
     ],
     coords: { x: 17, y: 83 },
     mode: 'bike',
-    note: 'No riding in darkness or morning fog. Reach Bageshwar by 5:30 PM.',
+    note: 'If fog or queues delay departure, drop optional stops or halt earlier—never recover time by riding after dark.',
+    pacing: 'Kainchi gets 09:00–11:00. Bhimtal is saved for the return or a future visit; Kasar Devi is not scheduled. This is still a tight transfer day, with only a small daylight margin.',
   },
   {
     day: '03',
@@ -89,34 +105,38 @@ const itinerary: Day[] = [
     theme: 'The decisive final climb',
     summary: 'Fill up at Thal, ask locals about the road, and continue through Ratapani only when the final stretch is clear of snow and ice.',
     stops: [
-      { time: '08:30', label: 'Bageshwar', note: 'Leave in full daylight' },
-      { time: '10:30', label: 'Thal', note: 'Last reliable fuel + local intel' },
-      { time: '12:30', label: 'Ratapani', note: 'Proceed only on a clean road' },
-      { time: '15:30', label: 'Munsyari', note: 'Check in before temperatures fall' },
+      { time: '07:00', label: 'Bageshwar', note: 'Allow 45–60 minutes for Baghnath Temple and the Sangam if open and accessible, then breakfast and checkout.', distance: 'START', travel: 'Local on foot', stay: '1.5 hrs', depart: '08:30', visit: 'Full visit', highlights: ['Baghnath Temple', 'Saryu–Gomti Sangam', 'Breakfast & road call'] },
+      { time: '10:30', label: 'Thal', note: 'Reserve a full hour for fuel, a warm meal and local road advice. Ek Hathiya Deval is not included in this halt.', from: 'Bageshwar', distance: '≈62 km', travel: '≈2 hrs', stay: '1 hr', depart: '11:30', visit: 'Meal / rest', highlights: ['Fill the tank', 'Lunch / warm meal', 'Ask local drivers'] },
+      { time: '12:45', label: 'Birthi Falls', note: 'Allow time for the viewpoint and tea. Skip the approach walk if steps or spray are icy; a full waterfall walk is not assumed.', from: 'Thal', distance: '≈29 km', travel: '≈1 hr 15 min', stay: '45 min', depart: '13:30', visit: 'Optional visit', highlights: ['Safe viewpoint', 'Hot tea', 'No icy steps'] },
+      { time: '14:15', label: 'Ratapani', note: 'Safety assessment, not a sightseeing halt. Turn back if grip or local advice is unfavorable.', from: 'Birthi Falls', distance: '≈14 km', travel: '≈45 min', stay: '15 min', depart: '14:30', visit: 'Safety stop', highlights: ['Road inspection', 'Local vehicle check', 'Go / no-go call'] },
+      { time: '15:15–15:30', label: 'Munsyari', note: 'Reserve an hour for check-in, warming up and unpacking. Keep any market walk close to the hotel.', from: 'Ratapani', distance: '≈17 km', travel: '≈45–60 min', stay: 'Overnight', visit: 'Overnight', highlights: ['Check-in & warm up', 'Panchachuli view', 'Early dinner'] },
     ],
     coords: { x: 41, y: 61 },
     mode: 'bike',
     note: 'The Ratapani road-status check is the day’s go/no-go decision.',
+    pacing: 'Baghnath + Sangam: 45–60 min; Thal meal/fuel: 60 min; Birthi viewpoint: 45 min. Remove the Birthi visit first if running late.',
   },
   {
     day: '04',
     date: '11 JAN',
     title: 'High Country',
-    route: 'Munsyari · Local circuit',
-    distance: '~40 km',
+    route: 'Munsyari · Slow local day',
+    distance: '≈60–70 km',
     saddle: 'Flexible',
     stay: 'Munsyari',
     theme: 'A day beneath Panchachuli',
-    summary: 'Keep the day flexible around trail and road conditions: Khaliya Top, Madkot hot springs, local heritage, and a Betulidhar sunset.',
+    summary: 'Give Madkot, Nanda Devi Temple and the museum real visiting time. A full Khaliya Top trek is an alternative day plan—not another stop to squeeze into this circuit.',
     stops: [
-      { time: 'SUNRISE', label: 'Khaliya Top', note: 'Only if the trail is not iced over' },
-      { time: '11:00', label: 'Madkot', note: 'Hot springs' },
-      { time: '14:30', label: 'Nanda Devi + Museum', note: 'Temple and Tribal Heritage Museum' },
-      { time: '17:00', label: 'Betulidhar', note: 'Sunset, then back before dark' },
+      { time: '07:30', label: 'Munsyari breakfast', note: 'Enjoy the mountain light from near the hotel; no pre-dawn bike transfer.', distance: 'START', travel: 'Local on foot', stay: '1 hr', depart: '08:30', visit: 'Meal / rest', highlights: ['Panchachuli view', 'Kumaoni breakfast', 'Check local conditions'] },
+      { time: '09:30', label: 'Madkot Hot Springs', note: 'Two hours for access, a relaxed visit and a meal. Confirm access and safe bathing conditions locally; carry a towel and dry layers.', from: 'Munsyari', distance: '≈22 km', travel: '≈1 hr', stay: '2 hrs', depart: '11:30', visit: 'Full visit', highlights: ['Thermal spring', 'Gori Ganga valley', 'Unhurried meal'] },
+      { time: '12:30', label: 'Nanda Devi Temple', note: 'An hour for the temple, photographs and a quiet walk. Confirm visiting hours locally.', from: 'Madkot', distance: '≈22 km', travel: '≈1 hr', stay: '1 hr', depart: '13:30', visit: 'Full visit', highlights: ['Temple', 'Panchachuli backdrop', 'Village walk'] },
+      { time: '13:45', label: 'Tribal Heritage Museum', note: 'Allow 75 minutes for the exhibits and stories, subject to opening hours. Leave the next hour as a tea/rest buffer.', from: 'Nanda Devi Temple', distance: '≈3 km', travel: '≈15 min', stay: '1 hr 15 min', depart: '15:00', visit: 'Full visit', highlights: ['Bhotiya heritage', 'Johar trade routes', 'Local crafts'] },
+      { time: '16:00', label: 'Betulidhar', note: 'A 30-minute late-afternoon viewpoint stop, then return to the hotel by about 5 PM. Do not wait for sunset if it means riding back in darkness.', from: 'Museum / town', distance: '≈8 km', travel: '≈30 min after rest', stay: '30 min', depart: '16:30', visit: 'Optional visit', highlights: ['Afternoon panorama', 'Mountain photographs', 'Daylight return'] },
     ],
     coords: { x: 74, y: 25 },
     mode: 'local',
-    note: 'Skip Khaliya Top if the trail is iced—conditions outrank the checklist.',
+    note: 'Khaliya Top replaces this circuit: reserve most of the daylight day, confirm conditions and guide advice, and never promise the summit in icy weather.',
+    pacing: 'Madkot: 2 hrs; temple: 1 hr; museum: 75 min. Khaliya is a separate choose-instead option, not a 2.5-hour sunrise add-on.',
   },
   {
     day: '05',
@@ -129,14 +149,16 @@ const itinerary: Day[] = [
     theme: 'Long descent, early start',
     summary: 'Start after the sun reaches the road to reduce black-ice risk, then descend through Thal and Bageshwar. This is the longest riding day.',
     stops: [
-      { time: '09:00', label: 'Munsyari', note: 'Roll after sunlight reaches the road' },
-      { time: '12:00', label: 'Thal', note: 'Fuel + warm drink' },
-      { time: '14:30', label: 'Bageshwar', note: 'Lunch and final push' },
-      { time: '17:00', label: 'Kausani', note: 'Check in before dark' },
+      { time: '08:00', label: 'Munsyari', note: 'Breakfast and checkout before the target departure; leave only when road conditions allow.', distance: 'START', travel: 'Preparation', stay: '1 hr', depart: '09:00', visit: 'Meal / rest', highlights: ['Warm breakfast', 'Pack & check out', 'Ice-status check'] },
+      { time: '12:00', label: 'Thal', note: 'Combine lunch, fuel and warming up in one proper halt.', from: 'Munsyari', distance: '≈68 km', travel: '≈3 hrs', stay: '1 hr', depart: '13:00', visit: 'Meal / rest', highlights: ['Seated lunch', 'Fuel', 'Warm-up break'] },
+      { time: '14:45', label: 'Bageshwar', note: 'A rest stop only; the temple visit was allocated earlier in the trip.', from: 'Thal', distance: '≈48 km', travel: '≈1 hr 45 min', stay: '15 min', depart: '15:00', visit: 'Meal / rest', highlights: ['Water refill', 'Stretch', 'Check daylight margin'] },
+      { time: '15:45', label: 'Baijnath', note: 'A proper temple visit needs 45–60 minutes. Default is to pass through; visit only if the route is running at least 30 minutes early.', from: 'Bageshwar', distance: '≈20 km', travel: '≈45 min', stay: '45–60 min if early', visit: 'Optional visit', highlights: ['Historic temple complex', 'Gomti riverside', 'Skip if behind schedule'] },
+      { time: '16:30–17:00', label: 'Kausani', note: 'Arrival target assumes no Baijnath visit. Check in and rest; Anasakti Ashram is planned for the next morning.', from: 'Baijnath side', distance: '≈18 km', travel: '≈40 min', stay: 'Overnight', visit: 'Overnight', highlights: ['Hotel check-in', 'Nearby mountain view', 'Dinner & rest'] },
     ],
     coords: { x: 57, y: 53 },
     mode: 'bike',
     note: 'Start only after sunlight reaches the road and softens black-ice risk.',
+    pacing: 'This is a transfer day, not a temple circuit. Reserve 60 minutes at Thal; Baijnath needs a real 45–60-minute visit and is omitted unless you are early.',
   },
   {
     day: '06',
@@ -147,17 +169,19 @@ const itinerary: Day[] = [
     saddle: '5 hrs',
     stay: 'Night train',
     theme: 'A calm final descent',
-    summary: 'Start after the fog lifts, descend via Almora and Bhimtal, then return the bikes by 4 PM for a generous station buffer.',
+    summary: 'Give Kausani an early local visit, then descend via Almora. A second Kainchi visit gets a real two-hour window if the road day stays on time; do not add Bhimtal as well.',
     stops: [
-      { time: '08:30', label: 'Kausani', note: 'Unhurried departure' },
-      { time: '11:30', label: 'Almora', note: 'Warm break' },
-      { time: '14:00', label: 'Kainchi / Bhimtal', note: 'Last hill stop' },
-      { time: '16:00', label: 'Kathgodam', note: 'Return bikes; train at 8:35 PM' },
-      { time: '20:35', label: 'Ranikhet Express', note: 'Overnight return to Old Delhi' },
+      { time: '06:30', label: 'Kausani', note: 'Allow 45–60 minutes at the nearby viewpoint / Anasakti Ashram if open, then breakfast and checkout. No tea-estate detour.', distance: 'START', travel: 'Local on foot', stay: '1.5 hrs', depart: '08:00', visit: 'Full visit', highlights: ['Himalayan morning view', 'Anasakti Ashram if open', 'Breakfast & checkout'] },
+      { time: '10:30', label: 'Almora', note: 'A half-hour meal break, not a Lala Bazaar shopping circuit. If fog delayed the start, omit the repeat Kainchi visit.', from: 'Kausani', distance: '≈55 km', travel: '≈2.5 hrs', stay: '30 min', depart: '11:00', visit: 'Meal / rest', highlights: ['Meal break', 'Bal Mithai takeaway', 'Stretch'] },
+      { time: '12:45', label: 'Kainchi Dham', note: 'Optional repeat visit with a full two-hour allowance. If you arrive late or queues are long, skip this repeat—not the bike-return buffer. Bhimtal is an alternative 1-hour lake stop, never an additional visit.', from: 'Almora', distance: '≈48 km', travel: '≈1 hr 45 min', stay: '1.5–2 hrs', depart: '14:45', visit: 'Optional visit', highlights: ['Unhurried darshan', 'Parking & queues', 'Or Bhimtal instead'] },
+      { time: '16:00', label: 'Kathgodam', note: 'Reserve about an hour for bike handover, deposit paperwork and repacking; use the remaining time for dinner and the station.', from: 'Kainchi Dham', distance: '≈35 km', travel: '≈1 hr 15 min', stay: '≈4 hrs', visit: 'Meal / rest', highlights: ['Bike return & deposit', 'Early dinner', 'Station by 19:45'] },
+      { time: '20:35', label: 'Ranikhet Express', note: 'Board the overnight return with a comfortable buffer.', from: 'Kathgodam', distance: '≈277 km', travel: '≈7 hrs', stay: 'Overnight', highlights: ['Confirm coach', 'Secure luggage', 'Share trip photos'] },
+      { time: 'EARLY 14 JAN', label: 'Old Delhi', note: 'Journey complete—avoid scheduling an early commitment.', from: 'Kathgodam', distance: '≈277 km', travel: 'Overnight rail', stay: 'Trip complete', highlights: ['Breakfast', 'Cab home', 'Rest day'] },
     ],
     coords: { x: 24, y: 79 },
     mode: 'bike',
     note: 'Protect the 4 PM bike-return target and keep a generous rail buffer.',
+    pacing: 'Kausani local visit: 45–60 min plus breakfast. Return Kainchi: 12:45–14:45 only if on time. No rushed 30-minute temple visit; no stacked Bhimtal detour.',
   },
 ]
 
@@ -173,7 +197,8 @@ const checklist = [
 const nodePositions = {
   3: [{ x: 17, y: 20 }, { x: 84, y: 50 }, { x: 17, y: 80 }],
   4: [{ x: 16, y: 20 }, { x: 84, y: 20 }, { x: 16, y: 80 }, { x: 84, y: 80 }],
-  5: [{ x: 15, y: 17 }, { x: 85, y: 17 }, { x: 13, y: 78 }, { x: 50, y: 88 }, { x: 87, y: 78 }],
+  5: [{ x: 15, y: 17 }, { x: 85, y: 17 }, { x: 13, y: 76 }, { x: 50, y: 84 }, { x: 87, y: 76 }],
+  6: [{ x: 14, y: 16 }, { x: 50, y: 15 }, { x: 86, y: 16 }, { x: 14, y: 82 }, { x: 50, y: 84 }, { x: 86, y: 82 }],
 }
 
 function DayMindMap({ day }: { day: Day }) {
@@ -181,6 +206,7 @@ function DayMindMap({ day }: { day: Day }) {
   useEffect(() => setSelectedStop(0), [day.day])
   const positions = nodePositions[day.stops.length as keyof typeof nodePositions] ?? nodePositions[4]
   const modeIcon = day.mode === 'rail' ? <Train size={24} /> : day.mode === 'local' ? <Compass size={24} /> : <Bike size={24} />
+  const selected = day.stops[selectedStop]
 
   return (
     <AnimatePresence mode="wait">
@@ -189,6 +215,7 @@ function DayMindMap({ day }: { day: Day }) {
           <span>{day.theme}</span>
           <div><i /> TAP ANY NODE TO EXPLORE</div>
         </div>
+        {day.pacing && <div className="day-pacing"><Clock3 size={20} /><div><strong>TIME TO ACTUALLY BE THERE</strong><p>{day.pacing}</p><small>Planning windows, not guarantees. Verify opening hours, queues and winter road conditions locally.</small></div></div>}
         <div className="mind-canvas">
           <svg className="mind-connectors" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
             {day.stops.map((_, index) => {
@@ -214,18 +241,40 @@ function DayMindMap({ day }: { day: Day }) {
                 onClick={() => setSelectedStop(index)}
               >
                 <span className="mind-node-index">{String(index + 1).padStart(2, '0')}</span>
+                {stop.visit && <span className={`visit-type ${stop.visit === 'Optional visit' ? 'optional' : ''}`}>{stop.visit}</span>}
                 <time>{stop.time}</time>
                 <strong>{stop.label}</strong>
-                <small>{stop.note}</small>
+                <div className="mind-node-meta"><span>{stop.distance}</span><span>{stop.travel}</span></div>
+                <small>Stay: {stop.stay}</small>
+                {stop.depart && <small className="node-depart">Leave by {stop.depart}</small>}
                 <i className="mind-node-pulse" />
               </motion.button>
             )
           })}
         </div>
         <div className="mind-inspector">
-          <div><span>SELECTED STOP / {String(selectedStop + 1).padStart(2, '0')}</span><strong>{day.stops[selectedStop]?.label}</strong></div>
-          <p>{day.stops[selectedStop]?.note}</p>
+          <div className="inspector-place"><span>SELECTED STOP / {String(selectedStop + 1).padStart(2, '0')}</span><strong>{selected?.label}</strong><p>{selected?.note}</p></div>
+          <div className="inspector-leg"><span>INCOMING LEG</span><strong>{selected?.from ? `${selected.from} → ${selected.label}` : 'Day starting point'}</strong><div><b><Route size={13} /> {selected?.distance}</b><b><Clock3 size={13} /> {selected?.travel}</b><b>HALT · {selected?.stay}</b>{selected?.depart && <b>LEAVE BY · {selected.depart}</b>}</div></div>
+          <div className="inspector-highlights"><span><Sparkles size={12} /> DO NOT MISS</span><div>{selected?.highlights.map((highlight) => <b key={highlight}>{highlight}</b>)}</div></div>
           <div className="mind-warning"><ShieldAlert size={16} /> {day.note}</div>
+        </div>
+        <div className="roadbook">
+          <div className="roadbook-heading"><div><span>DETAILED DAY ROADBOOK</span><strong>Point-to-point plan</strong></div><p>{day.stops.length} STOPS · OPTIONAL VISITS ARE NOT CUMULATIVE</p></div>
+          <div className="roadbook-grid">
+            {day.stops.map((stop, index) => (
+              <motion.button key={`${stop.label}-roadbook`} className={selectedStop === index ? 'active' : ''} onClick={() => setSelectedStop(index)} whileHover={{ y: -3 }}>
+                <div className="roadbook-card-top"><span>{String(index + 1).padStart(2, '0')}</span><time>{stop.time}</time></div>
+                {stop.visit && <span className={`visit-type ${stop.visit === 'Optional visit' ? 'optional' : ''}`}>{stop.visit}</span>}
+                <h4>{stop.label}</h4>
+                <div className="roadbook-leg"><small>{stop.from ? `FROM ${stop.from}` : 'DAY START'}</small><div><b>{stop.distance}</b><i /><b>{stop.travel}</b></div></div>
+                <p>{stop.note}</p>
+                <div className="roadbook-stay"><Clock3 size={13} /><span>Planned halt</span><strong>{stop.stay}</strong></div>
+                {stop.depart && <div className="roadbook-depart"><ArrowRight size={13} /><span>Next-leg departure</span><strong>{stop.depart}</strong></div>}
+                <div className="roadbook-do"><span>DO HERE</span>{stop.highlights.map((highlight) => <i key={highlight}><Check size={11} />{highlight}</i>)}</div>
+              </motion.button>
+            ))}
+          </div>
+          <p className="roadbook-disclaimer">Distances and driving times are approximate. Arrival windows depend on the previous halt and road conditions; longer visits require dropping optional stops, not riding faster or after dark.</p>
         </div>
       </motion.div>
     </AnimatePresence>
@@ -290,7 +339,7 @@ function App() {
       </section>
 
       <section className="fact-strip">
-        <div><span>01</span><strong>590 km</strong><small>BIKE DISTANCE</small></div>
+        <div><span>01</span><strong>≈550 km</strong><small>INTERCITY RIDING</small></div>
         <div><span>02</span><strong>6 days</strong><small>06 JOURNEY STAGES</small></div>
         <div><span>03</span><strong>2,200 m</strong><small>TOP ELEVATION</small></div>
         <div className="risk-fact"><span>04</span><strong>17 km</strong><small>SNOW-RISK ZONE</small></div>
