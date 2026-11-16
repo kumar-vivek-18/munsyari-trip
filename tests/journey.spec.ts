@@ -118,3 +118,26 @@ test('mobile stop sheet fits and returns to its route', async ({ page }) => {
   await dialog.getByRole('button', { name: 'Back to the route' }).click()
   await expect(dialog).not.toBeVisible()
 })
+
+test('destination images, credits and place links work while train uses an icon', async ({ page }) => {
+  await page.goto('/day/02?view=places')
+  const place = page.locator('.place-row').first()
+  await expect(place.getByRole('img')).toHaveAttribute('src', '/places/kainchi.jpg')
+  await expect.poll(() => place.getByRole('img').evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBe(true)
+  await expect(place.locator('.place-photo-credit')).toContainText('Manvikesarwani09')
+  await expect(place.getByRole('link', { name: 'View Kainchi Dham on Google Maps' })).toHaveAttribute('href', /google\.com\/maps\/search\/.+Kainchi/)
+  await page.goto('/day/01')
+  await page.getByRole('button', { name: 'Open stop 2: Ranikhet Express 15013' }).click()
+  await expect(page.getByRole('dialog').locator('.stop-photo-block img')).toHaveCount(0)
+  await expect(page.getByRole('dialog').locator('.place-illustration-rail')).toBeVisible()
+  await expect(page.getByRole('dialog').locator('.place-map-link')).toHaveAttribute('href', /Delhi/)
+})
+
+test('failed photos fall back gracefully without blocking stop tasks', async ({ page }) => {
+  await page.route('**/places/kainchi.jpg', (route) => route.abort())
+  await page.goto('/day/02')
+  await page.getByRole('button', { name: 'Open stop 2: Kainchi Dham' }).click()
+  await expect(page.getByRole('dialog').locator('.place-illustration-temple')).toBeVisible()
+  await expect(page.getByRole('dialog').locator('.stop-task-list button')).toHaveCount(3)
+  await expect(page.getByRole('dialog').locator('.stop-dialog-timing')).toContainText('1.5–2 hrs')
+})

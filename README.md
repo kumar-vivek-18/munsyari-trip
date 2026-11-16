@@ -41,3 +41,5 @@ The primary local day deliberately does not combine a full Khaliya Top trek with
 ## Photo credit
 
 Panchachuli image: [Suresh Karia, Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Panchchuli_II.jpg), [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Displayed with cropping and visual overlays. Maps © OpenStreetMap contributors.
+
+Destination photos are bundled in `public/places`, with complete attribution in [`public/places/CREDITS.md`](public/places/CREDITS.md). The UI includes per-photo source and license links. Photos are historical reference views, not live conditions. Stops without a verified photo use category illustrations, and train steps use rail icons. Each stop and place guide offers a Google Maps place-search link.

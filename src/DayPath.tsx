@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowDown, ArrowLeft, ArrowRight, Check, CheckCheck, Clock3, Flag, ListChecks, MapPin, Route, ShieldAlert, X } from 'lucide-react'
 import type { Day } from './App'
+import { PlaceCredit, PlaceMapLink, PlaceVisual } from './PlaceVisual'
+import { getPlaceMedia } from './place-media'
 import './day-path.css'
 
 type SavedTasks = Record<string, boolean>
@@ -70,7 +72,7 @@ export default function DayPath({ day, compact = false }: { day: Day; compact?: 
               <div className="path-stop-row"><span className={`path-step-marker ${done === item.highlights.length ? 'complete' : ''}`}>{done === item.highlights.length ? <Check size={17} /> : String(index + 1).padStart(2, '0')}</span>
                 <motion.button className="path-stop" onClick={() => openStop(index)} aria-haspopup="dialog" aria-label={`Open stop ${index + 1}: ${item.label}`} whileHover={{ x: 4 }}>
                   <div className="path-stop-top"><time>{item.time}</time><span className={`path-visit ${item.visit === 'Optional visit' ? 'optional' : ''}`}>{item.visit || (index === 0 ? 'Journey starts' : 'Journey step')}</span></div>
-                  <h4>{item.label}</h4>{!compact && <p>{item.note}</p>}
+                  <div className="stop-label-visual"><PlaceVisual label={item.label} thumbnail /><div><h4>{item.label}</h4><small>{getPlaceMedia(item.label).category}</small></div></div>{!compact && <p>{item.note}</p>}
                   <div className="path-stop-stats"><span><Clock3 size={13} />Stay <b>{item.stay}</b></span>{item.depart && <span>Leave by <b>{item.depart}</b></span>}</div>
                   <div className="path-stop-bottom"><span><ListChecks size={14} />{done}/{item.highlights.length} checked</span><strong>Open tasks & details <ArrowRight size={16} /></strong></div>
                 </motion.button>
@@ -94,7 +96,9 @@ export default function DayPath({ day, compact = false }: { day: Day; compact?: 
       <div className="stop-dialog-content">
         <header><span>DAY {day.day} / STOP {String(selected + 1).padStart(2, '0')} OF {day.stops.length}</span><button autoFocus onClick={() => dialog.current?.close()} aria-label="Close stop details"><X size={20} /></button></header>
         <div className="stop-dialog-scroll" ref={scrollArea}>
+          <div className="stop-photo-block"><PlaceVisual label={stop.label} /><PlaceCredit label={stop.label} /></div>
           <div className="stop-dialog-intro"><span><MapPin size={15} />{stop.visit || 'Journey step'}</span><h2 id={`stop-dialog-title-${day.day}`}>{stop.label}</h2><p>{stop.note}</p></div>
+          <div className="stop-location-actions"><PlaceMapLink label={stop.label} /><span>Opens a place search · confirm locally</span></div>
           <div className="stop-dialog-timing"><div><span>ARRIVE / START</span><strong>{stop.time}</strong></div><div><span>TIME HERE</span><strong>{stop.stay}</strong></div><div><span>{stop.depart ? 'LEAVE BY' : 'DEPARTURE'}</span><strong>{stop.depart || (stop.stay === 'Overnight' ? 'Next morning' : 'See next step')}</strong></div></div>
           {selected > 0 && <div className="stop-incoming"><Route size={16} /><div><small>GETTING HERE</small><strong>{day.stops[selected - 1].label} → {stop.label}</strong><p>{stop.distance} · {stop.travel}</p></div></div>}
           <div className="stop-task-heading"><div><span>AT THIS STOP</span><h3>What to do here.</h3></div><b>{countDone(selected)}/{stop.highlights.length}</b></div>
