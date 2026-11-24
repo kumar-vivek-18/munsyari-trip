@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowDown, ArrowLeft, ArrowRight, Check, CheckCheck, Clock3, Flag, ListChecks, MapPin, Route, ShieldAlert, X } from 'lucide-react'
 import type { Day } from './App'
-import { PlaceCredit, PlaceMapLink, PlaceVisual } from './PlaceVisual'
+import { PlaceMapLink, PlaceVisual } from './PlaceVisual'
+import { PlaceGallery } from './PlaceGallery'
 import { getPlaceMedia } from './place-media'
 import './day-path.css'
 
@@ -97,7 +98,7 @@ export default function DayPath({ day, compact = false }: { day: Day; compact?: 
       <div className="stop-dialog-content">
         <header><span>DAY {day.day} / STOP {String(selected + 1).padStart(2, '0')} OF {day.stops.length}</span><button autoFocus onClick={() => dialog.current?.close()} aria-label="Close stop details"><X size={20} /></button></header>
         <div className="stop-dialog-scroll" ref={scrollArea}>
-          <div className="stop-photo-block"><PlaceVisual label={stop.label} /><PlaceCredit label={stop.label} /></div>
+          <div className="stop-photo-block"><PlaceGallery label={stop.label} /></div>
           <div className="stop-dialog-intro"><span><MapPin size={15} />{stop.visit || 'Journey step'}</span><h2 id={`stop-dialog-title-${day.day}`}>{stop.label}</h2><p>{stop.note}</p></div>
           <div className="stop-location-actions"><PlaceMapLink label={stop.label} /><span>Opens a place search · confirm locally</span></div>
           <div className="stop-dialog-timing"><div><span>ARRIVE / START</span><strong>{stop.time}</strong></div><div><span>TIME HERE</span><strong>{stop.stay}</strong></div><div><span>{stop.depart ? 'LEAVE BY' : 'DEPARTURE'}</span><strong>{stop.depart || (stop.stay === 'Overnight' ? 'Next morning' : 'See next step')}</strong></div></div>

@@ -66,6 +66,9 @@
 .stop-dialog { max-width: min(640px, calc(100vw - 32px)); width: 640px; max-height: min(880px, calc(100dvh - 40px)); padding: 0; color: #e2eee0; background: #13291b; border: 1px solid #6e9369; overflow: hidden; box-shadow: 0 35px 100px #0009; }
 .stop-dialog::backdrop { background: #061009c9; backdrop-filter: blur(9px); }
 .stop-dialog[open] { animation: stop-panel-in .25s ease-out; }
+@media (prefers-reduced-motion: reduce) {
+  .stop-dialog[open] { animation: none; }
+}
 @keyframes stop-panel-in { from { opacity: 0; transform: translateY(20px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
 .stop-dialog-content { display: flex; flex-direction: column; max-height: min(880px, calc(100dvh - 40px)); }
 .stop-dialog header { display: flex; align-items: center; justify-content: space-between; padding: 17px 26px; border-bottom: 1px solid #385437; flex-shrink: 0; }

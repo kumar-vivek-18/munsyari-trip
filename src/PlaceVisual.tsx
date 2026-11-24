@@ -1,17 +1,16 @@
 import { useState } from 'react'
 import { Bike, Building2, Camera, Droplets, ExternalLink, Fuel, Landmark, MapPin, MountainSnow, Train } from 'lucide-react'
-import { getPlaceMedia, placeMapUrl, type PlaceKind, type PlaceMedia } from './place-media'
+import { getPlaceMedia, placeMapUrl, type PlaceKind, type PlaceMedia, type PlacePhoto } from './place-media'
 import './place-visual.css'
 
 const icons = { temple: Landmark, town: Building2, rail: Train, water: Droplets, mountain: MountainSnow, fuel: Fuel, heritage: Landmark, bike: Bike }
 
-function Photo({ place, thumbnail }: { place: PlaceMedia; thumbnail: boolean }) {
+export function Photo({ place, thumbnail = false, photo = place.photo, expanded = false }: { place: PlaceMedia; thumbnail?: boolean; photo?: PlacePhoto; expanded?: boolean }) {
   const [failed, setFailed] = useState(false)
   const [loaded, setLoaded] = useState(false)
   const Icon = icons[place.kind as PlaceKind]
-  const photo = place.photo
-  if (!photo || failed) return <div className={`place-illustration place-illustration-${place.kind}`}><Icon aria-hidden="true" size={thumbnail ? 24 : 44} />{!thumbnail && <><strong>{place.name}</strong><small>{place.category}</small></>}</div>
-  return <div className={`place-photo ${loaded ? 'loaded' : ''}`}><img src={photo.src} alt={thumbnail ? '' : photo.alt} loading={thumbnail ? 'lazy' : 'eager'} decoding="async" width={900} height={600} style={{ objectPosition: photo.position || 'center' }} onLoad={() => setLoaded(true)} onError={() => setFailed(true)} />{!thumbnail && <span className="place-photo-caption"><Camera size={12} />{photo.caption}</span>}</div>
+  if (!photo || failed) return <div className={`place-illustration place-illustration-${place.kind}`}><Icon aria-hidden="true" size={thumbnail ? 24 : 44} />{!thumbnail && <><strong>{place.name}</strong><small>{failed ? 'Photo unavailable · try another view' : place.category}</small></>}</div>
+  return <div className={`place-photo ${loaded ? 'loaded' : ''} ${expanded ? 'expanded' : ''}`}><img src={photo.src} alt={thumbnail ? '' : photo.alt} loading={thumbnail ? 'lazy' : 'eager'} decoding="async" width={900} height={600} style={{ objectPosition: photo.position || 'center' }} onLoad={() => setLoaded(true)} onError={() => setFailed(true)} />{!thumbnail && !expanded && <span className="place-photo-caption"><Camera size={12} />{photo.caption}</span>}</div>
 }
 
 export function PlaceVisual({ label, thumbnail = false }: { label: string; thumbnail?: boolean }) {
@@ -22,6 +21,10 @@ export function PlaceVisual({ label, thumbnail = false }: { label: string; thumb
 export function PlaceCredit({ label }: { label: string }) {
   const photo = getPlaceMedia(label).photo
   if (!photo) return null
+  return <PhotoCredit photo={photo} />
+}
+
+export function PhotoCredit({ photo }: { photo: PlacePhoto }) {
   return <div className="place-photo-credit"><a href={photo.source} target="_blank" rel="noreferrer">Photo: {photo.author}</a><span>·</span><a href={photo.licenseUrl} target="_blank" rel="noreferrer">{photo.license}</a><span>· resized / cropped</span></div>
 }
 

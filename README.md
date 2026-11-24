@@ -18,6 +18,8 @@ npm run dev
 
 Each stop opens an accessible task dialog (bottom sheet on mobile) with timing, incoming and next legs, and a per-stop checklist. Previous/next controls follow travel order. Checklists are saved in the current browser's local storage. Day plans can be copied or printed.
 
+Stop details and place guides include photo galleries with thumbnails, photo-specific credits and a larger, uncropped viewer. Browse with arrows, keyboard Left/Right (Home/End), or swipe on mobile; Escape returns to the stop details. Galleries reset when changing stops. Photos are local assets and thumbnails load lazily. Stops without verified local images provide an external place-photo search link; train steps retain their rail icon. Khaliya stay and trailhead galleries explicitly identify their landscape / onward-trail reference views.
+
 Day pages use three views: **Schedule & map**, **Places to visit**, and **Preparation**. The active view is shareable via `?view=places` or `?view=prepare`. Persistent navigation keeps every day one click away; the schedule and map appear side by side on desktop and stack on mobile.
 
 ## Validation
