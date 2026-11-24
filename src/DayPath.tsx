@@ -9,10 +9,11 @@ import './day-path.css'
 type SavedTasks = Record<string, boolean>
 
 export default function DayPath({ day, compact = false }: { day: Day; compact?: boolean }) {
+  const storageKey = `northbound-tasks-${day.day}${Number(day.day) >= 3 ? '-khaliya-v1' : ''}`
   const [selected, setSelected] = useState(0)
   const [tasks, setTasks] = useState<SavedTasks>(() => {
     try {
-      const saved: unknown = JSON.parse(localStorage.getItem(`northbound-tasks-${day.day}`) || '{}')
+      const saved: unknown = JSON.parse(localStorage.getItem(storageKey) || '{}')
       return saved && typeof saved === 'object' && !Array.isArray(saved)
         ? Object.fromEntries(Object.entries(saved).filter(([, value]) => value === true)) : {}
     } catch { return {} }
@@ -27,8 +28,8 @@ export default function DayPath({ day, compact = false }: { day: Day; compact?: 
   const countDone = (index: number) => day.stops[index].highlights.filter((_, taskIndex) => tasks[taskKey(index, taskIndex)]).length
 
   useEffect(() => {
-    try { localStorage.setItem(`northbound-tasks-${day.day}`, JSON.stringify(tasks)) } catch { /* Storage can be unavailable. */ }
-  }, [day.day, tasks])
+    try { localStorage.setItem(storageKey, JSON.stringify(tasks)) } catch { /* Storage can be unavailable. */ }
+  }, [storageKey, tasks])
 
   useEffect(() => {
     const element = dialog.current

@@ -31,7 +31,7 @@ function MapPlaceholder() { return <div className="planner-map-loading"><Compass
 
 function Checklist({ index }: { index: number }) {
   const guide = dayGuides[index]
-  const key = `northbound-day-${itinerary[index].day}-ready`
+  const key = `northbound-day-${itinerary[index].day}-ready${index >= 2 ? '-khaliya-v1' : ''}`
   const [checks, setChecks] = useState<number[]>(() => {
     try { const value: unknown = JSON.parse(localStorage.getItem(key) || '[]'); return Array.isArray(value) ? value.filter((item): item is number => Number.isInteger(item) && item >= 0 && item < guide.essentials.length) : [] } catch { return [] }
   })

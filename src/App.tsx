@@ -45,7 +45,7 @@ export type Day = {
     highlights: string[]
   }[]
   coords: { x: number; y: number }
-  mode: 'rail' | 'bike' | 'local'
+  mode: 'rail' | 'bike' | 'local' | 'trek'
   note: string
   pacing?: string
 }
@@ -107,7 +107,7 @@ export const itinerary: Day[] = [
       { time: '10:30', label: 'Thal', note: 'Reserve a full hour for fuel, a warm meal and local road advice. Ek Hathiya Deval is not included in this halt.', from: 'Bageshwar', distance: '≈62 km', travel: '≈2 hrs', stay: '1 hr', depart: '11:30', visit: 'Meal / rest', highlights: ['Fill the tank', 'Lunch / warm meal', 'Ask local drivers'] },
       { time: '12:45', label: 'Birthi Falls', note: 'Allow time for the viewpoint and tea. Skip the approach walk if steps or spray are icy; a full waterfall walk is not assumed.', from: 'Thal', distance: '≈29 km', travel: '≈1 hr 15 min', stay: '45 min', depart: '13:30', visit: 'Optional visit', highlights: ['Safe viewpoint', 'Hot tea', 'No icy steps'] },
       { time: '14:15', label: 'Ratapani', note: 'Safety assessment, not a sightseeing halt. Turn back if grip or local advice is unfavorable.', from: 'Birthi Falls', distance: '≈14 km', travel: '≈45 min', stay: '15 min', depart: '14:30', visit: 'Safety stop', highlights: ['Road inspection', 'Local vehicle check', 'Go / no-go call'] },
-      { time: '15:15–15:30', label: 'Munsyari', note: 'Reserve an hour for check-in, warming up and unpacking. Keep any market walk close to the hotel.', from: 'Ratapani', distance: '≈17 km', travel: '≈45–60 min', stay: 'Overnight', visit: 'Overnight', highlights: ['Check-in & warm up', 'Panchachuli view', 'Early dinner'] },
+      { time: '15:15–15:30', label: 'Munsyari', note: 'Check in, warm up and meet tomorrow’s trek guide. Confirm the Khaliya overnight location, January operation, meals and equipment; arrange secure bike parking, luggage storage and both trailhead transfers.', from: 'Ratapani', distance: '≈17 km', travel: '≈45–60 min', stay: 'Overnight', visit: 'Overnight', highlights: ['Confirm guide & Khaliya stay', 'Arrange parking, bags & transfers', 'Pack trek bag & rest'] },
     ],
     coords: { x: 41, y: 61 },
     mode: 'bike',
@@ -117,69 +117,68 @@ export const itinerary: Day[] = [
   {
     day: '04',
     date: '11 JAN',
-    title: 'High Country',
-    route: 'Munsyari · Slow local day',
-    distance: '≈60–70 km',
-    saddle: 'Flexible',
-    stay: 'Munsyari',
-    theme: 'A day beneath Panchachuli',
-    summary: 'Give Madkot, Nanda Devi Temple and the museum real visiting time. A full Khaliya Top trek is an alternative day plan—not another stop to squeeze into this circuit.',
+    title: 'Khaliya Overnight Trek',
+    route: 'Munsyari → Nanda Devi Temple → Khaliya Top',
+    distance: '≈12–15 km transfer + 6–8 km trek',
+    saddle: '5–7 hrs walking',
+    stay: 'Khaliya Top area',
+    theme: 'A night above Munsyari',
+    summary: 'Visit Nanda Devi Temple before transferring to Balati Bend for the Khaliya Top trek. Enjoy the Himalayan panorama and stay overnight in the Khaliya area, returning to Munsyari the following morning. Confirm the overnight shelter with your guide before leaving town.',
     stops: [
-      { time: '07:30', label: 'Munsyari breakfast', note: 'Enjoy the mountain light from near the hotel; no pre-dawn bike transfer.', distance: 'START', travel: 'Local on foot', stay: '1 hr', depart: '08:30', visit: 'Meal / rest', highlights: ['Panchachuli view', 'Kumaoni breakfast', 'Check local conditions'] },
-      { time: '09:30', label: 'Madkot Hot Springs', note: 'Two hours for access, a relaxed visit and a meal. Confirm access and safe bathing conditions locally; carry a towel and dry layers.', from: 'Munsyari', distance: '≈22 km', travel: '≈1 hr', stay: '2 hrs', depart: '11:30', visit: 'Full visit', highlights: ['Thermal spring', 'Gori Ganga valley', 'Unhurried meal'] },
-      { time: '12:30', label: 'Nanda Devi Temple', note: 'An hour for the temple, photographs and a quiet walk. Confirm visiting hours locally.', from: 'Madkot', distance: '≈22 km', travel: '≈1 hr', stay: '1 hr', depart: '13:30', visit: 'Full visit', highlights: ['Temple', 'Panchachuli backdrop', 'Village walk'] },
-      { time: '13:45', label: 'Tribal Heritage Museum', note: 'Allow 75 minutes for the exhibits and stories, subject to opening hours. Leave the next hour as a tea/rest buffer.', from: 'Nanda Devi Temple', distance: '≈3 km', travel: '≈15 min', stay: '1 hr 15 min', depart: '15:00', visit: 'Full visit', highlights: ['Bhotiya heritage', 'Johar trade routes', 'Local crafts'] },
-      { time: '16:00', label: 'Betulidhar', note: 'A 30-minute late-afternoon viewpoint stop, then return to the hotel by about 5 PM. Do not wait for sunset if it means riding back in darkness.', from: 'Museum / town', distance: '≈8 km', travel: '≈30 min after rest', stay: '30 min', depart: '16:30', visit: 'Optional visit', highlights: ['Afternoon panorama', 'Mountain photographs', 'Daylight return'] },
+      { time: '06:45', label: 'Munsyari trek briefing', note: 'Breakfast, checkout and guide briefing. Leave bikes and main luggage with the hotel; carry only the overnight trek bag. Confirm the trail, overnight stay and temple opening time; leave town after daylight.', distance: 'START', travel: 'Preparation', stay: '45 min', depart: '07:30', visit: 'Meal / rest', highlights: ['Breakfast & guide briefing', 'Store bikes and main bags', 'Check overnight kit & temple hours'] },
+      { time: '07:45', label: 'Nanda Devi Temple', note: 'A 45-minute visit for darshan, the Panchachuli backdrop and a short walk around the temple grounds. Confirm opening time the evening before. If closed or delayed, keep a brief exterior visit where permitted and continue to the trailhead on time.', from: 'Munsyari', distance: '≈2–3 km road', travel: '≈15 min transfer', stay: '45 min', depart: '08:30', visit: 'Full visit', highlights: ['Nanda Devi darshan if open', 'Panchachuli photographs', 'Leave for trailhead by 08:30'] },
+      { time: '09:15', label: 'Balati Bend trailhead', note: 'Continue by the arranged vehicle via Munsyari to Khaliya Dwar / Balati Bend. Check entry arrangements, traction equipment and the guide’s turnaround time before starting on foot.', from: 'Nanda Devi Temple', distance: '≈10–12 km road', travel: '≈45 min transfer', stay: '15 min', depart: '09:30', visit: 'Safety stop', highlights: ['Confirm trail access', 'Adjust boots, poles & traction', 'Agree turnaround & pickup'] },
+      { time: '13:30–14:30', label: 'Khaliya Top', note: 'Allow 4–5 hours uphill including short food and water breaks for the roughly 6 km trail. Enjoy Panchachuli, Nanda Kot and the surrounding peaks if clear. The summit is around 3,500 m; skip Zero Point and shorten the climb if snow slows progress.', from: 'Balati Bend', distance: '≈6 km on foot', travel: '≈4–5 hrs ascent with breaks', stay: '30 min', depart: '15:00 latest', visit: 'Full visit', highlights: ['Steady ascent & hydration', 'Himalayan panorama', 'Reach overnight shelter in daylight'] },
+      { time: '15:30–16:30', label: 'Khaliya overnight stay', note: 'Stay overnight in the Khaliya Top area at the lodge or supported camp confirmed by your operator. This may be below the summit; its exact position determines today’s final walk and tomorrow’s descent. Settle in before dusk, have an early dinner and arrange a 07:30 daylight descent.', from: 'Khaliya Top', distance: '≈0–2 km, stay-dependent', travel: 'Up to 1.5 hrs to shelter', stay: 'Overnight', depart: '07:30 · 12 JAN', visit: 'Overnight', highlights: ['Check sleeping kit, meals & water', 'Warm dry layers & early dinner', 'Confirm morning descent & transfer'] },
     ],
     coords: { x: 74, y: 25 },
-    mode: 'local',
-    note: 'Khaliya Top replaces this circuit: reserve most of the daylight day, confirm conditions and guide advice, and never promise the summit in icy weather.',
-    pacing: 'Madkot: 2 hrs; temple: 1 hr; museum: 75 min. Khaliya is a separate choose-instead option, not a 2.5-hour sunrise add-on.',
+    mode: 'trek',
+    note: 'January access and overnight shelter must be confirmed locally. If the guide cannot confirm both, stay in Munsyari and use a local day instead. Snow can lengthen every walking estimate.',
+    pacing: '11 Jan: Nanda Devi Temple 07:45–08:30, Balati Bend 09:15, trek from 09:30, then overnight at Khaliya. Keep the temple stop within 45 minutes to protect the daylight ascent. 12 Jan: descend after daylight and return to Munsyari by about 11:00.',
   },
   {
     day: '05',
     date: '12 JAN',
-    title: 'Turn South',
-    route: 'Munsyari → Kausani',
-    distance: '155 km',
-    saddle: '7 hrs',
-    stay: 'Kausani',
-    theme: 'Long descent, early start',
-    summary: 'Start after the sun reaches the road to reduce black-ice risk, then descend through Thal and Bageshwar. This is the longest riding day.',
+    title: 'Descend & Ride South',
+    route: 'Khaliya → Munsyari → Thal → Bageshwar',
+    distance: '≈4–6 km trek + 125 km road',
+    saddle: '2–3 hrs walk + 5–6 hrs road',
+    stay: 'Bageshwar',
+    theme: 'Morning on foot, afternoon down the valley',
+    summary: 'Return from the Khaliya overnight stay after daylight, collect bikes and bags in Munsyari, then ride via Thal to Bageshwar. Kausani is removed to make room for the trek and retain the 13 January return train.',
     stops: [
-      { time: '08:00', label: 'Munsyari', note: 'Breakfast and checkout before the target departure; leave only when road conditions allow.', distance: 'START', travel: 'Preparation', stay: '1 hr', depart: '09:00', visit: 'Meal / rest', highlights: ['Warm breakfast', 'Pack & check out', 'Ice-status check'] },
-      { time: '12:00', label: 'Thal', note: 'Combine lunch, fuel and warming up in one proper halt.', from: 'Munsyari', distance: '≈68 km', travel: '≈3 hrs', stay: '1 hr', depart: '13:00', visit: 'Meal / rest', highlights: ['Seated lunch', 'Fuel', 'Warm-up break'] },
-      { time: '14:45', label: 'Bageshwar', note: 'A rest stop only; the temple visit was allocated earlier in the trip.', from: 'Thal', distance: '≈48 km', travel: '≈1 hr 45 min', stay: '15 min', depart: '15:00', visit: 'Meal / rest', highlights: ['Water refill', 'Stretch', 'Check daylight margin'] },
-      { time: '15:45', label: 'Baijnath', note: 'A proper temple visit needs 45–60 minutes. Default is to pass through; visit only if the route is running at least 30 minutes early.', from: 'Bageshwar', distance: '≈20 km', travel: '≈45 min', stay: '45–60 min if early', visit: 'Optional visit', highlights: ['Historic temple complex', 'Gomti riverside', 'Skip if behind schedule'] },
-      { time: '16:30–17:00', label: 'Kausani', note: 'Arrival target assumes no Baijnath visit. Check in and rest; Anasakti Ashram is planned for the next morning.', from: 'Baijnath side', distance: '≈18 km', travel: '≈40 min', stay: 'Overnight', visit: 'Overnight', highlights: ['Hotel check-in', 'Nearby mountain view', 'Dinner & rest'] },
+      { time: '06:45', label: 'Khaliya morning', note: 'Enjoy first light from close to the shelter, eat breakfast and pack. Start the descent only with daylight and guide-confirmed footing; no extra summit or Zero Point outing this morning.', distance: 'START', travel: 'At overnight shelter', stay: '45 min', depart: '07:30', visit: 'Meal / rest', highlights: ['Breakfast & pack out litter', 'Check descent conditions', 'Confirm trailhead pickup'] },
+      { time: '09:30–10:30', label: 'Balati Bend return', note: 'Descend with the guide, allowing 2–3 hours from the confirmed stay location. Meet the arranged vehicle for the return to Munsyari; snow can push this window later.', from: 'Khaliya overnight stay', distance: '≈4–6 km on foot', travel: '≈2–3 hrs descent', stay: 'Pickup buffer within transfer', depart: '10:30 target', visit: 'Safety stop', highlights: ['Controlled descent', 'Check everyone has returned', 'Meet pre-arranged transfer'] },
+      { time: '10:00–11:00', label: 'Munsyari bike collection', note: 'Collect luggage and bikes, change out of trekking gear and have food. Allow 30 minutes minimum; only depart if rested and the road is clear. Target 11:30 latest for the planned Bageshwar ride.', from: 'Balati Bend', distance: '≈9 km road', travel: '≈30 min transfer', stay: '30–60 min', depart: '11:30 latest', visit: 'Meal / rest', highlights: ['Collect bags & inspect bikes', 'Eat, change & assess fatigue', 'Confirm daylight riding window'] },
+      { time: '14:30 target', label: 'Thal', note: 'Lunch, fuel and warm-up in one halt. This timing assumes an 11:30 Munsyari departure and clear roads. If delayed, stop earlier and revise bike return / rail arrangements rather than riding into darkness.', from: 'Munsyari', distance: '≈68 km', travel: '≈3 hrs riding', stay: '30 min', depart: '15:00 target', visit: 'Meal / rest', highlights: ['Lunch & fuel', 'Check fatigue and daylight', 'Confirm Bageshwar arrival'] },
+      { time: '16:45–17:00 target', label: 'Bageshwar', note: 'Check in for the final hill night. Stay near the main route with parking, dinner and an early breakfast. No Baijnath or Kausani detour after the morning trek.', from: 'Thal', distance: '≈48 km', travel: '≈1 hr 45 min–2 hrs', stay: 'Overnight', visit: 'Overnight', highlights: ['Check-in & dinner', 'Reconfirm bike return and train', 'Pack for an early road start'] },
     ],
     coords: { x: 57, y: 53 },
     mode: 'bike',
-    note: 'Start only after sunlight reaches the road and softens black-ice risk.',
-    pacing: 'This is a transfer day, not a temple circuit. Reserve 60 minutes at Thal; Baijnath needs a real 45–60-minute visit and is omitted unless you are early.',
+    note: 'This is a tight trek-and-ride day. If descent, ice or fatigue prevents an 11:30 departure from Munsyari, halt earlier and revise the return arrangements. Do not recover time by riding after dark.',
+    pacing: 'Descent: 07:30–10:30; transfer and bike collection: until 11:30; Thal: 14:30–15:00; Bageshwar: 16:45–17:00. These are clear-condition targets, with little spare daylight. Kausani and Baijnath are omitted.',
   },
   {
     day: '06',
     date: '13 JAN',
     title: 'Down to the Rails',
-    route: 'Kausani → Kathgodam',
-    distance: '120 km',
-    saddle: '5 hrs',
+    route: 'Bageshwar → Almora → Kathgodam',
+    distance: '≈155 km',
+    saddle: '6–7 hrs riding',
     stay: 'Night train',
     theme: 'A calm final descent',
-    summary: 'Give Kausani an early local visit, then descend via Almora. A second Kainchi visit gets a real two-hour window if the road day stays on time; do not add Bhimtal as well.',
+    summary: 'Leave Bageshwar after daylight and return directly through Almora and the Kainchi corridor. Keep the afternoon for bike handover and the evening train; the full Kainchi visit remains on Day 02.',
     stops: [
-      { time: '06:30', label: 'Kausani', note: 'Allow 45–60 minutes at the nearby viewpoint / Anasakti Ashram if open, then breakfast and checkout. No tea-estate detour.', distance: 'START', travel: 'Local on foot', stay: '1.5 hrs', depart: '08:00', visit: 'Full visit', highlights: ['Himalayan morning view', 'Anasakti Ashram if open', 'Breakfast & checkout'] },
-      { time: '10:30', label: 'Almora', note: 'A half-hour meal break, not a Lala Bazaar shopping circuit. If fog delayed the start, omit the repeat Kainchi visit.', from: 'Kausani', distance: '≈55 km', travel: '≈2.5 hrs', stay: '30 min', depart: '11:00', visit: 'Meal / rest', highlights: ['Meal break', 'Bal Mithai takeaway', 'Stretch'] },
-      { time: '12:45', label: 'Kainchi Dham', note: 'Optional repeat visit with a full two-hour allowance. If you arrive late or queues are long, skip this repeat—not the bike-return buffer. Bhimtal is an alternative 1-hour lake stop, never an additional visit.', from: 'Almora', distance: '≈48 km', travel: '≈1 hr 45 min', stay: '1.5–2 hrs', depart: '14:45', visit: 'Optional visit', highlights: ['Unhurried darshan', 'Parking & queues', 'Or Bhimtal instead'] },
-      { time: '16:00', label: 'Kathgodam', note: 'Reserve about an hour for bike handover, deposit paperwork and repacking; use the remaining time for dinner and the station.', from: 'Kainchi Dham', distance: '≈35 km', travel: '≈1 hr 15 min', stay: '≈4 hrs', visit: 'Meal / rest', highlights: ['Bike return & deposit', 'Early dinner', 'Station by 19:45'] },
+      { time: '07:00', label: 'Bageshwar departure', note: 'Breakfast and checkout, then depart at about 08:00 if visibility and road grip allow. Reconfirm bike-return arrangements before leaving.', distance: 'START', travel: 'Preparation', stay: '1 hr', depart: '08:00', visit: 'Meal / rest', highlights: ['Early breakfast & checkout', 'Fuel and road check', 'Reconfirm rental handover'] },
+      { time: '11:00–11:30', label: 'Almora', note: 'Take a proper lunch and stretch break. Follow the direct return route without market or temple detours.', from: 'Bageshwar', distance: '≈70 km', travel: '≈3–3.5 hrs', stay: '45 min', depart: '12:15 latest', visit: 'Meal / rest', highlights: ['Lunch & water', 'Stretch and warm up', 'Check station and return timing'] },
+      { time: '15:00–16:00', label: 'Kathgodam', note: 'Continue through the Kainchi corridor without a repeat darshan stop. Return bikes by the 16:00 target, allow an hour for checks and deposit paperwork, then dinner and station transfer.', from: 'Almora via Kainchi', distance: '≈83 km', travel: '≈3–3.5 hrs including short breaks', stay: 'Until station transfer', visit: 'Meal / rest', highlights: ['Bike return & deposit', 'Early dinner', 'Station by 19:45'] },
       { time: '20:35', label: 'Ranikhet Express', note: 'Departure checkpoint: reach the station by 19:45 and board the overnight return with a comfortable buffer.', from: 'Kathgodam bike return', distance: 'Local transfer', travel: 'Station transfer + boarding buffer', stay: 'Overnight on board', depart: '20:35', highlights: ['Confirm coach and berth', 'Secure luggage and keep ticket accessible', 'Check expected arrival before planning a cab'] },
       { time: 'EARLY 14 JAN', label: 'Old Delhi', note: 'Journey complete—avoid scheduling an early commitment.', from: 'Kathgodam', distance: '≈277 km', travel: 'Overnight rail', stay: 'Trip complete', highlights: ['Breakfast', 'Cab home', 'Rest day'] },
     ],
     coords: { x: 24, y: 79 },
     mode: 'bike',
     note: 'Protect the 4 PM bike-return target and keep a generous rail buffer.',
-    pacing: 'Kausani local visit: 45–60 min plus breakfast. Return Kainchi: 12:45–14:45 only if on time. No rushed 30-minute temple visit; no stacked Bhimtal detour.',
+    pacing: 'Bageshwar departure: 08:00; Almora lunch: 45 min; bike return: by 16:00; station: 19:45; train: 20:35. Kainchi receives its full 1.5–2-hour visit on Day 02, with no repeat visit today.',
   },
 ]
 
@@ -252,7 +251,7 @@ function App() {
       <section className="fact-strip">
         <div><span>01</span><strong>≈550 km</strong><small>INTERCITY RIDING</small></div>
         <div><span>02</span><strong>6 days</strong><small>06 JOURNEY STAGES</small></div>
-        <div><span>03</span><strong>2,200 m</strong><small>TOP ELEVATION</small></div>
+        <div><span>03</span><strong>≈3,500 m</strong><small>KHALIYA TOP</small></div>
         <div className="risk-fact"><span>04</span><strong>17 km</strong><small>SNOW-RISK ZONE</small></div>
       </section>
 
@@ -274,7 +273,7 @@ function App() {
         <div className="chapter-grid">
           {itinerary.map((item, index) => <motion.div key={item.day} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: index % 3 * .09 }}>
             <Link className={`chapter-card chapter-${item.day}`} to={`/day/${item.day}`}>
-              <div className="chapter-top"><span>{item.date} / 2027</span>{item.mode === 'rail' ? <Train size={19} /> : item.mode === 'local' ? <Compass size={19} /> : <Bike size={19} />}</div>
+              <div className="chapter-top"><span>{item.date} / 2027</span>{item.mode === 'rail' ? <Train size={19} /> : item.mode === 'local' || item.mode === 'trek' ? <Compass size={19} /> : <Bike size={19} />}</div>
               <span className="chapter-number">{item.day}</span>
               <div className="chapter-content"><small>{item.theme}</small><h3>{item.title}</h3><p>{item.route}</p><div><span>{item.distance}</span><span>{item.stops.length} stops</span><span>{item.stay}</span></div></div>
               <div className="chapter-bottom"><span>EXPLORE DAY {item.day}</span><ArrowRight size={18} /></div>
